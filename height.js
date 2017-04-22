@@ -6,6 +6,10 @@
  */
 "use strict";
 
+function sumArray(a, b) {
+    return a + b;
+}
+
 /**
  * zero ... return a heightmap of all zeroes
  *
@@ -220,6 +224,62 @@ function mountains(mesh, n, r) {
             var m = mounts[j];
 	    // compute the height that mounain adds to this point
             newvals[i] += Math.pow(Math.exp(-((p[0] - m[0]) * (p[0] - m[0]) + (p[1] - m[1]) * (p[1] - m[1])) / (2 * r * r)), 2);
+        }
+    }
+    return newvals;
+}
+
+/**
+ * ridges ... create long mountains on the height map
+ *  height = (e^-dist/radius)^2
+ *
+ * @param   mesh
+ * @param   number of ridges
+ * @param   desired width of ridges
+ * @param   desired length of ridges (in units of width)
+ * @return  new height map
+ */
+function ridges(mesh, n, r1, r2) {
+    n = n || 5;
+    r1 = r1 || 0.02;
+    r2 = r2 || 20;
+    
+    // choose a center location for the ridges
+    var cent = [((Math.random() - 0.5) * 0.5), ((Math.random() - 0.5) * 0.5)];
+    var angle = Math.random() * 2 * Math.PI;
+    var ridgeangle = angle + Math.PI / 2;
+    var inter = [];
+    for (var i = 0; i < n; i++) {
+        inter.push((2.5 + Math.random() * 0.5) * r1);
+    }
+    var interCenter = inter.reduce(sumArray, 0) / 2.0;
+    // extrapolate from center to each ridge center
+    var mounts = [];
+    for (var i = 0; i < n; i++) {
+        var ridgecheatw = (Math.random() - 0.5) * r1 * 2;
+        var ridgecheath = (Math.random() - 0.5) * r1 * 2;
+        var fromCenter = interCenter - inter.slice(0,i).reduce(sumArray, 0);
+        var ridgecent = [cent[0] + Math.cos(angle) * fromCenter + ridgecheatw, cent[1] + Math.sin(angle) * fromCenter + ridgecheath];
+        var ridgeLength = Math.floor(Math.random() * (r2 + 1)) + Math.floor(r2 / 2);
+        for (var j = 0; j < ridgeLength; j++) {
+            var thisAngle = ridgeangle + (Math.random() - 0.5) * Math.PI * 0.1;
+            var cheatw = (Math.random() - 0.5) * r1 * 0.5;
+            var cheath = (Math.random() - 0.5) * r1 * 0.5;        
+            var wdist = r1 * (j - r2/2) + (Math.random() - 0.5) * r1 * 0.5;
+            var hdist = r1 * (j - r2/2) + (Math.random() - 0.5) * r1 * 0.5;
+            mounts.push([ridgecent[0] + Math.cos(thisAngle) * wdist + cheatw, ridgecent[1] + Math.sin(thisAngle) * hdist + cheath]);
+        }
+    }
+
+    var newvals = zero(mesh);
+    // for each point in mesh
+    for (var i = 0; i < mesh.vxs.length; i++) {
+        var p = mesh.vxs[i];
+        // for each mountain
+        for (var j = 0; j < mounts.length; j++) {
+            var m = mounts[j];
+            // compute the height that mountain adds to this point
+            newvals[i] += 0.5 * Math.pow(Math.exp(-((p[0] - m[0]) * (p[0] - m[0]) + (p[1] - m[1]) * (p[1] - m[1])) / (2 * r1 * r1)), 2);
         }
     }
     return newvals;

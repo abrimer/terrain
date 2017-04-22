@@ -17,12 +17,211 @@
  *
  * @param	division to which pannel should be added
  */
-function addSVG(div) {
+function addSVG(div, h, w) {
+    h = h || 400
+    w = w || 400
     return div.insert("svg", ":first-child")
-        .attr("height", 400)
-        .attr("width", 400)
+        .attr("height", h)
+        .attr("width", w)
         .attr("viewBox", "-500 -500 1000 1000");
 }
+
+/**
+ * main editing window
+ *  button: generate random height map
+ *  button: copy map from above
+ *  button: show the coast line
+ *  button: show rivers
+ *  button: show slope shading
+ */
+var mainDiv = d3.select("div#main");
+var mainSVG = addSVG(mainDiv, 400, 400);
+var mainRender = {
+    params: defaultParams,
+    h: zero(generateGoodMesh(defaultParams.npts, defaultExtent)),
+    cities: []
+};
+
+var mainViewCoast = false;
+var mainViewRivers = false;
+var mainViewSlope = false;
+var mainViewHeight = true;
+var mainViewErosion = false;
+var mainViewScore = false;
+var mainViewTerr = false;
+var mainViewCities = true;
+
+function mainDraw() {
+    if (mainViewErosion) {
+        visualizeVoronoi(mainSVG, erosionRate(mainRender.h));
+    } else if (mainViewScore) {
+        var score = cityScore(mainRender.h, mainRender.cities);
+        visualizeVoronoi(mainSVG, score, d3.max(score) - 0.5);
+    } else if (mainViewHeight) {
+        visualizeVoronoi(mainSVG, mainRender.h, 0, 1);
+    } else {
+        mainSVG.selectAll("path.field").remove();
+    }
+    if (mainViewCoast) {
+        drawPaths(mainSVG, "coast", contour(mainRender.h, 0));
+    } else {
+        drawPaths(mainSVG, "coast", []);
+    }
+    if (mainViewRivers) {
+        drawPaths(mainSVG, "river", getRivers(mainRender.h, 0.01));
+    } else {
+        drawPaths(mainSVG, "river", []);
+    }
+    if (mainViewSlope) {
+        visualizeSlopes(mainSVG, {h:mainRender.h});
+    } else {
+        visualizeSlopes(mainSVG, {h:zero(mainRender.h.mesh)});
+    }
+    if (mainViewCities) {
+        visualizeCities(mainSVG, mainRender);
+    }
+}
+mainDiv.append("h3")
+    .text("Basics")
+// create a flat map
+mainDiv.append("button")
+    .text("Reset to flat")
+    .on("click", function () {
+        mainRender.cities = [];
+        mainRender.h = zero(mainRender.h.mesh); 
+        mainDraw();
+    });
+// choose a slope vector, and slope the entire map
+mainDiv.append("button")
+    .text("Add random slope")
+    .on("click", function () {
+        mainRender.h = add(mainRender.h, slope(mainRender.h.mesh, randomVector(4)));
+        mainDraw();
+    });
+// slope the map downwards out from the center
+mainDiv.append("button")
+    .text("Add cone")
+    .on("click", function () {
+        mainRender.h = add(mainRender.h, cone(mainRender.h.mesh, -0.5));
+        mainDraw();
+    });
+// slope the map upwards out from the center
+mainDiv.append("button")
+    .text("Add inverted cone")
+    .on("click", function () {
+        mainRender.h = add(mainRender.h, cone(mainRender.h.mesh, 0.5));
+        mainDraw();
+    });
+// add five randomly chosen mountains
+mainDiv.append("button")
+    .text("Add five blobs")
+    .on("click", function () {
+        mainRender.h = add(mainRender.h, mountains(mainRender.h.mesh, 5));
+        mainDraw();
+    });
+// add five randomly chosen ridges
+mainDiv.append("button")
+    .text("Add five ridges")
+    .on("click", function () {
+        mainRender.h = add(mainRender.h, ridges(mainRender.h.mesh, 7, 0.05, 15.0));
+        mainDraw();
+    });
+// normalize the height map to 0-1
+mainDiv.append("button")
+    .text("Normalize heightmap")
+    .on("click", function () {
+        mainRender.h = normalize(mainRender.h);
+        mainDraw();
+    });
+// exaggerate the vertical relief
+mainDiv.append("button")
+    .text("Round hills")
+    .on("click", function () {
+        mainRender.h = peaky(mainRender.h);
+        mainDraw();
+    });
+// smooth the terrain
+mainDiv.append("button")
+    .text("Relax")
+    .on("click", function () {
+        mainRender.h = relax(mainRender.h);
+        mainDraw();
+    });
+mainDiv.append("button")
+    .text("Erode")
+    .on("click", function () {
+        mainRender.h = doErosion(mainRender.h, 0.1);
+        mainDraw();
+    });
+// draw a sea-level line
+mainDiv.append("button")
+    .text("Set sea level to median")
+    .on("click", function () {
+        mainRender.h = setSeaLevel(mainRender.h, 0.5);
+        mainDraw();
+    });
+mainDiv.append("h3")
+    .text("Presets")
+mainDiv.append("button")
+    .text("Generate fjords")
+    .on("click", function () {
+        mainRender.cities = [];
+        mainRender.h = generateFjords(defaultParams);
+        mainDraw();
+    });
+mainDiv.append("button")
+    .text("Generate coast")
+    .on("click", function () {
+        mainRender.cities = [];
+        mainRender.h = generateCoast(defaultParams);
+        mainDraw();
+    });
+mainDiv.append("h3")
+    .text("Views")
+var mainCoastBut = mainDiv.append("button")
+    .text("Show coastline")
+    .on("click", function () {
+        mainViewCoast = !mainViewCoast;
+        mainCoastBut.text(mainViewCoast ? "Hide coastline" : "Show coastline");
+        mainDraw();
+    });
+var mainRiverBut = mainDiv.append("button")
+    .text("Show rivers")
+    .on("click", function () {
+        mainViewRivers = !mainViewRivers;
+        mainRiverBut.text(mainViewRivers ? "Hide rivers" : "Show rivers");
+        mainDraw();
+    });
+var mainSlopeBut = mainDiv.append("button")
+    .text("Show slope shading")
+    .on("click", function () {
+        mainViewSlope = !mainViewSlope;
+        mainSlopeBut.text(mainViewSlope ? "Hide slope shading" : "Show slope shading");
+        mainDraw();
+    });
+var mainHeightBut = mainDiv.append("button")
+    .text("Hide heightmap")
+    .on("click", function () {
+        mainViewHeight = !mainViewHeight;
+        mainHeightBut.text(mainViewHeight ? "Hide heightmap" : "Show heightmap");
+        mainDraw();
+    });
+// var mainCityBut = mainDiv.append("button")
+//     .text("Show territories")
+//     .on("click", function () {
+//         cityViewScore = !cityViewScore;
+//         cityViewBut.text(cityViewScore ? "Show territories" : "Show city location scores");
+//         cityDraw();
+//     });
+mainDiv.append("button")
+    .text("Add new city")
+    .on("click", function () {
+        placeCity(mainRender);
+        mainDraw();
+    });
+
+
+
 
 /**
  * mesh generation demonstration
@@ -111,6 +310,13 @@ primDiv.append("button")
         primDraw();
     });
 
+primDiv.append("button")
+    .text("Generate fjords")
+    .on("click", function () {
+        primH = generateFjords(defaultParams);
+        primDraw();
+    });
+
 // choose a slope vector, and slope the entire map
 primDiv.append("button")
     .text("Add random slope")
@@ -140,6 +346,14 @@ primDiv.append("button")
     .text("Add five blobs")
     .on("click", function () {
         primH = add(primH, mountains(primH.mesh, 5));
+        primDraw();
+    });
+
+// add five randomly chosen ridges
+primDiv.append("button")
+    .text("Add five ridges")
+    .on("click", function () {
+        primH = add(primH, ridges(primH.mesh, 7, 0.05, 15.0));
         primDraw();
     });
 
@@ -425,7 +639,7 @@ var cityViewBut = cityDiv.append("button")
  *
  */
 var finalDiv = d3.select("div#final");
-var finalSVG = addSVG(finalDiv);
+var finalSVG = addSVG(finalDiv, 1000, 1000);
 finalDiv.append("button")
     .text("Copy map from above")
     .on("click", function () {

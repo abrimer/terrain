@@ -262,6 +262,25 @@ function generateCoast(params) {
     return h;
 }
 
+function generateFjords(params) {
+    var mesh = generateGoodMesh(params.npts, params.extent);
+    var h = add(
+            slope(mesh, randomVector(4)),
+            cone(mesh, runif(-1, -1)),
+            ridges(mesh, runif(3,7), runif(0.02, 0.05), runif(5,15)),
+            mountains(mesh, 30)
+            );
+    for (var i = 0; i < 10; i++) {
+        h = relax(h);
+    }
+    h = peaky(h);
+    h = doErosion(h, runif(0, 0.1), 5);
+    h = setSeaLevel(h, runif(0.2, 0.6));
+    h = fillSinks(h);
+    h = cleanCoast(h, 3);
+    return h;
+}
+
 function drawLabels(svg, render) {
     var params = render.params;
     var h = render.h;
@@ -451,7 +470,7 @@ function drawMap(svg, render) {
     drawPaths(svg, 'border', render.borders);
     visualizeSlopes(svg, render);
     visualizeCities(svg, render);
-    drawLabels(svg, render);
+    //drawLabels(svg, render);
 }
 
 function doMap(svg, params) {
@@ -473,9 +492,9 @@ function doMap(svg, params) {
 var defaultParams = {
     extent: defaultExtent,
     generator: generateCoast,
-    npts: 16384,
-    ncities: 15,
-    nterrs: 5,
+    npts: 32768,
+    ncities: 5,
+    nterrs: 2,
     fontsizes: {
         region: 40,
         city: 25,
