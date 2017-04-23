@@ -86,6 +86,19 @@ function peaky(h) {
 }
 
 /**
+ * spiky ... make mountains concave
+ *
+ *  replace each height with its square
+ *  leaves tallest mountains high and lowers all else
+ *
+ * @param   height map
+ * @return  new (normalized) height map
+ */
+function spiky(h) {
+    return map(normalize(h), function (x) {return Math.pow(x, 2)});
+}
+
+/**
  * downhill - construct/return a 
  *
  * @param	height map

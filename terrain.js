@@ -262,7 +262,7 @@ function generateCoast(params) {
     return h;
 }
 
-function generateFjords(params) {
+function generateFjord(params) {
     var mesh = generateGoodMesh(params.npts, params.extent);
     var h = add(
             slope(mesh, randomVector(4)),
@@ -280,6 +280,25 @@ function generateFjords(params) {
     h = cleanCoast(h, 3);
     return h;
 }
+
+function generateMountain(params) {
+    var mesh = generateGoodMesh(params.npts, params.extent);
+    var h = add(
+            slope(mesh, randomVector(4)),
+            cone(mesh, runif(-1, -1)),
+            mountains(mesh, 50)
+            );
+    for (var i = 0; i < 5; i++) {
+        h = relax(h);
+    }
+    h = peaky(h);
+    h = doErosion(h, runif(0.05, 0.15), 5);
+    h = setSeaLevel(h, runif(0.0, 0.05));
+    h = fillSinks(h);
+    h = cleanCoast(h, 3);
+    return h;
+}
+
 
 function drawLabels(svg, render) {
     var params = render.params;

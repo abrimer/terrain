@@ -42,14 +42,14 @@ var mainRender = {
     cities: []
 };
 
-var mainViewCoast = false;
-var mainViewRivers = false;
-var mainViewSlope = false;
-var mainViewHeight = true;
+var mainViewSlope = true;
+var mainViewHeight = false;
 var mainViewErosion = false;
 var mainViewScore = false;
-var mainViewTerr = false;
+var mainViewCoast = true;
+var mainViewRivers = true;
 var mainViewCities = true;
+var mainViewBorders = true;
 
 function mainDraw() {
     if (mainViewErosion) {
@@ -80,10 +80,12 @@ function mainDraw() {
     if (mainViewCities) {
         visualizeCities(mainSVG, mainRender);
     }
+    if (mainViewBorders) {
+        mainRender.terr = getTerritories(mainRender);
+        drawPaths(mainSVG, 'border', getBorders(mainRender));
+    }
 }
-mainDiv.append("h3")
-    .text("Basics")
-// create a flat map
+
 mainDiv.append("button")
     .text("Reset to flat")
     .on("click", function () {
@@ -91,6 +93,9 @@ mainDiv.append("button")
         mainRender.h = zero(mainRender.h.mesh); 
         mainDraw();
     });
+mainDiv.append("h3")
+    .text("Add")
+// create a flat map
 // choose a slope vector, and slope the entire map
 mainDiv.append("button")
     .text("Add random slope")
@@ -126,6 +131,14 @@ mainDiv.append("button")
         mainRender.h = add(mainRender.h, ridges(mainRender.h.mesh, 7, 0.05, 15.0));
         mainDraw();
     });
+mainDiv.append("button")
+    .text("Add new city")
+    .on("click", function () {
+        placeCity(mainRender);
+        mainDraw();
+    });
+mainDiv.append("h3")
+    .text("Shape")
 // normalize the height map to 0-1
 mainDiv.append("button")
     .text("Normalize heightmap")
@@ -166,7 +179,7 @@ mainDiv.append("button")
     .text("Generate fjords")
     .on("click", function () {
         mainRender.cities = [];
-        mainRender.h = generateFjords(defaultParams);
+        mainRender.h = generateFjord(defaultParams);
         mainDraw();
     });
 mainDiv.append("button")
@@ -176,49 +189,70 @@ mainDiv.append("button")
         mainRender.h = generateCoast(defaultParams);
         mainDraw();
     });
+mainDiv.append("button")
+    .text("Generate mountains")
+    .on("click", function () {
+        mainRender.cities = [];
+        mainRender.h = generateMountain(defaultParams);
+        mainDraw();
+    });
 mainDiv.append("h3")
     .text("Views")
 var mainCoastBut = mainDiv.append("button")
-    .text("Show coastline")
+    .text("Hide coastline")
     .on("click", function () {
         mainViewCoast = !mainViewCoast;
         mainCoastBut.text(mainViewCoast ? "Hide coastline" : "Show coastline");
         mainDraw();
     });
 var mainRiverBut = mainDiv.append("button")
-    .text("Show rivers")
+    .text("Hide rivers")
     .on("click", function () {
         mainViewRivers = !mainViewRivers;
         mainRiverBut.text(mainViewRivers ? "Hide rivers" : "Show rivers");
         mainDraw();
     });
 var mainSlopeBut = mainDiv.append("button")
-    .text("Show slope shading")
+    .text("Hide slope shading")
     .on("click", function () {
         mainViewSlope = !mainViewSlope;
         mainSlopeBut.text(mainViewSlope ? "Hide slope shading" : "Show slope shading");
         mainDraw();
     });
 var mainHeightBut = mainDiv.append("button")
-    .text("Hide heightmap")
+    .text("Show heightmap")
     .on("click", function () {
         mainViewHeight = !mainViewHeight;
         mainHeightBut.text(mainViewHeight ? "Hide heightmap" : "Show heightmap");
         mainDraw();
     });
-// var mainCityBut = mainDiv.append("button")
-//     .text("Show territories")
-//     .on("click", function () {
-//         cityViewScore = !cityViewScore;
-//         cityViewBut.text(cityViewScore ? "Show territories" : "Show city location scores");
-//         cityDraw();
-//     });
-mainDiv.append("button")
-    .text("Add new city")
+var mainCityBut = mainDiv.append("button")
+    .text("Hide cities")
     .on("click", function () {
-        placeCity(mainRender);
+        mainViewCities = !mainViewCities;
+        mainCityBut.text(mainViewCities ? "Hide cities" : "Show cities");
         mainDraw();
     });
+var mainBorderBut = mainDiv.append("button")
+    .text("Hide borders")
+    .on("click", function () {
+        mainViewBorders = !mainViewBorders;
+        mainBorderBut.text(mainViewBorders ? "Hide borders" : "Show borders");
+        mainDraw();
+    });
+var mainPathBut = mainDiv.append("button")
+    .text("Hide paths")
+    .on("click", function () {
+        mainViewPaths = !mainViewPaths;
+        mainPathBut.text(mainViewPaths ? "Hide borders" : "Show borders");
+        mainDraw();
+    });
+// mainDiv.append("")
+//     .text("Save")
+//     .on("click", function () {
+//         var canvas = document.getElementById("canvas");
+
+//     });
 
 
 
