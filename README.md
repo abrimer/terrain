@@ -2,7 +2,7 @@
 
 This is a fork of Martin O'Leary's very interesting work with usability enhancements by Mark Kampe. I made this fork because I want to make savable maps I can create from presets and adjust on the fly.
 
-In order to save the svg, I recommend NYT's [crowbar bookmarklet](nytimes.github.io/svg-crowbar/).
+In order to save the svg, I recommend NYT's [crowbar bookmarklet](http://nytimes.github.io/svg-crowbar/).
 
 # Original Creator Information and License
 
