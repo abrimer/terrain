@@ -182,6 +182,13 @@ mainDiv.append("button")
         mainRender.h = setSeaLevel(mainRender.h, 0.5);
         mainDraw();
     });
+mainDiv.append("button")
+    .text("Clean coastlines")
+    .on("click", function () {
+        mainRender.h = cleanCoast(mainRender.h, 1);
+        mainRender.h = fillSinks(mainRender.h);
+        mainDraw();
+    });
 mainDiv.append("h3")
     .text("Presets")
 mainDiv.append("button")
