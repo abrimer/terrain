@@ -32,7 +32,8 @@ var mainSVG = addSVG(mainDiv, 400, 400);
 var mainRender = {
     params: defaultParams,
     h: zero(generateGoodMesh(defaultParams.npts, defaultExtent)),
-    cities: []
+    cities: [],
+    lang: makeRandomLanguage()
 };
 
 var mainViewSlope = true;
@@ -43,6 +44,7 @@ var mainViewCoast = true;
 var mainViewRivers = true;
 var mainViewCities = true;
 var mainViewBorders = true;
+var mainViewLabels = true;
 
 function mainDraw() {
     if (mainViewErosion) {
@@ -76,6 +78,20 @@ function mainDraw() {
     if (mainViewBorders) {
         mainRender.terr = getTerritories(mainRender);
         drawPaths(mainSVG, 'border', getBorders(mainRender));
+    }
+    if (mainViewLabels) {
+        mainRender.rivers = getRivers(mainRender.h, 0.01);
+        mainRender.coasts = contour(mainRender.h, 0);
+        mainRender.terr = getTerritories(mainRender);
+        mainRender.borders = getBorders(mainRender);
+        drawLabels(mainSVG, mainRender);
+    } else {
+        mainSVG.selectAll('text.region')
+            .text(function (d) {return ""})
+            .raise();
+        mainSVG.selectAll('text.city')
+            .text(function (d) {return ""})
+            .raise();
     }
 }
 
@@ -240,10 +256,23 @@ var mainBorderBut = mainDiv.append("button")
         mainBorderBut.text(mainViewBorders ? "Hide borders" : "Show borders");
         mainDraw();
     });
-var mainPathBut = mainDiv.append("button")
-    .text("Hide paths")
+mainDiv.append("h3")
+    .text("Language")
+var mainLabelBut = mainDiv.append("button")
+    .text("Hide labels")
     .on("click", function () {
-        mainViewPaths = !mainViewPaths;
-        mainPathBut.text(mainViewPaths ? "Hide borders" : "Show borders");
+        mainViewLabels = !mainViewLabels;
+        mainLabelBut.text(mainViewLabels ? "Hide labels" : "Show labels");
+        mainDraw();
+    });
+mainDiv.append("button")
+    .text("New labels")
+    .on("click", function () {
+        mainDraw();
+    });
+mainDiv.append("button")
+    .text("New language")
+    .on("click", function () {
+        mainRender.lang = makeRandomLanguage();
         mainDraw();
     });

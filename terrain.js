@@ -321,14 +321,16 @@ function generateIsland(params) {
     return h;
 }
 
-function drawLabels(svg, render) {
+function drawLabels(svg, render, newLang = false) {
     var params = render.params;
     var h = render.h;
     var terr = render.terr;
     var cities = render.cities;
     var nterrs = render.params.nterrs;
     var avoids = [render.rivers, render.coasts, render.borders];
-    var lang = makeRandomLanguage();
+    if (newLang) {
+        render.lang = makeRandomLanguage();
+    }
     var citylabels = [];
     function penalty(label) {
         var pen = 0;
@@ -367,7 +369,7 @@ function drawLabels(svg, render) {
     for (var i = 0; i < cities.length; i++) {
         var x = h.mesh.vxs[cities[i]][0];
         var y = h.mesh.vxs[cities[i]][1];
-        var text = makeName(lang, 'city');
+        var text = makeName(render.lang, 'city');
         var size = i < nterrs ? params.fontsizes.city : params.fontsizes.town;
         var sx = 0.65 * size/1000 * text.length;
         var sy = size/1000;
@@ -431,7 +433,7 @@ function drawLabels(svg, render) {
     var reglabels = [];
     for (var i = 0; i < nterrs; i++) {
         var city = cities[i];
-        var text = makeName(lang, 'region');
+        var text = makeName(render.lang, 'region');
         var sy = params.fontsizes.region / 1000;
         var sx = 0.6 * text.length * sy;
         var lc = terrCenter(h, terr, city, true);
@@ -510,7 +512,7 @@ function drawMap(svg, render) {
     drawPaths(svg, 'border', render.borders);
     visualizeSlopes(svg, render);
     visualizeCities(svg, render);
-    //drawLabels(svg, render);
+    drawLabels(svg, render);
 }
 
 function doMap(svg, params) {
