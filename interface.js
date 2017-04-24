@@ -28,7 +28,7 @@ function addSVG(div, h, w) {
  * main editing window
  */
 var mainDiv = d3.select("div#main");
-var mainSVG = addSVG(mainDiv, 400, 400);
+var mainSVG = addSVG(mainDiv, 500, 500);
 var mainRender = {
     params: defaultParams,
     h: zero(generateGoodMesh(defaultParams.npts, defaultExtent)),
@@ -133,11 +133,11 @@ mainDiv.append("button")
         mainRender.h = add(mainRender.h, mountains(mainRender.h.mesh, 5));
         mainDraw();
     });
-// add five randomly chosen ridges
+// add seven randomly chosen ridges
 mainDiv.append("button")
-    .text("Add five ridges")
+    .text("Add seven ridges")
     .on("click", function () {
-        mainRender.h = add(mainRender.h, ridges(mainRender.h.mesh, 7, 0.05, 15.0));
+        mainRender.h = add(mainRender.h, ridges(mainRender.h.mesh, 7, 0.04, 15.0));
         mainDraw();
     });
 mainDiv.append("button")
