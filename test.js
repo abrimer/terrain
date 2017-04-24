@@ -196,6 +196,13 @@ mainDiv.append("button")
         mainRender.h = generateMountain(defaultParams);
         mainDraw();
     });
+mainDiv.append("button")
+    .text("Generate islands")
+    .on("click", function () {
+        mainRender.cities = [];
+        mainRender.h = generateIsland(defaultParams);
+        mainDraw();
+    });
 mainDiv.append("h3")
     .text("Views")
 var mainCoastBut = mainDiv.append("button")

@@ -299,6 +299,27 @@ function generateMountain(params) {
     return h;
 }
 
+function generateIsland(params) {
+    var mesh = generateGoodMesh(params.npts, params.extent);
+    var h = add(
+            //slope(mesh, randomVector(4)),
+            cone(mesh, runif(-1, -1)),
+            mountains(mesh, runif(10,20))
+        )
+    var numRidges = runif(1, 2);
+    for (var i = 0; i < numRidges; i++) {
+        h = add(h, ridges(mesh, runif(1,2), runif(0.02, 0.05), runif(5,15)));
+    }
+    for (var i = 0; i < 10; i++) {
+        h = relax(h);
+    }
+    h = peaky(h);
+    h = doErosion(h, runif(0.05, 0.1), 5);
+    h = setSeaLevel(h, runif(0.6, 0.75));
+    h = fillSinks(h);
+    h = cleanCoast(h, 3);
+    return h;
+}
 
 function drawLabels(svg, render) {
     var params = render.params;
