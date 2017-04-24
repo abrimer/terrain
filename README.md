@@ -1,13 +1,8 @@
-# This is a fork of mewo2/terrain, created:
-* because the owner (Martin O'Leary) considers it to be complete
-    and has moved on to other projects.
-* I want to take it in a slightly different direction.
-    The creator's goal was a fantasy Atlas.  My goal is to create a 
-    plausible geograpic/resource/village/trade foundation for FRPG
-    development.
-* I want to find a way to make it easier for other people to 
-    change design decision parameters and engines (so they can 
-    change the way that worlds unfold).
+# Why?
+
+This is a fork of Martin O'Leary's very interesting work with usability enhancements by Mark Kampe. I made this fork because I want to make savable maps I can create from presets and adjust on the fly.
+
+In order to save the svg, I recommend NYT's [crowbar bookmarklet](nytimes.github.io/svg-crowbar/).
 
 # Original Creator Information and License
 
@@ -25,21 +20,4 @@ If you do make something interesting with this code, please do still let me know
 [uncharted]: https://twitter.com/unchartedatlas
 [notes]: https://mewo2.com/notes/terrain/
 [license]: https://github.com/mewo2/terrain/blob/master/LICENSE.md
-
-# My Intentions
-1. comment the original (to help me understand it).
-2. refactor it into smaller modules (to make it easier to work on).
-3. modeling enhancements
-   * sedimentation and soil development
-   * valuable mineral deposits
-   * flora generation
-   * herbavore generation
-   * carnivore generation
-4. usage enhancements
-   * adapt it for use in a try-and-tweak world-generation model.
-   * enable it to export a variety of map overlays.
- 
-
-
-
 

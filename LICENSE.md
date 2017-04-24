@@ -23,3 +23,6 @@ This code is licensed under the MIT License:
 
 All of my modifications are available under the same terms.
 Mark Kampe, 2017
+
+All of my modifications are available under the same terms.
+Dane Bell, 2017
