@@ -25,15 +25,76 @@ function zero(mesh) {
     return z;
 }
 
+function randArb(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+
+/**
+ * slopeRiver ... create a sloping height map
+ *
+ * @param	mesh
+ * @param	imposed slope gradient
+ */
+function slopeRiver(mesh, direction) {
+    return mesh.map(function (x) {
+      if (x[0] < 0) {
+        return Math.pow(1.75*x[0]*-direction[0],1)
+        - Math.sin(x[1]*direction[0])
+        - Math.sin(0.7*x[1]*direction[0])
+        // return Math.pow(x[0]*-direction[0],1) - Math.cos(x[1]*direction[0])
+      } else {
+        return Math.pow(1.75*x[0]*direction[0],1)
+        + Math.sin(x[1]*direction[0])
+        + Math.sin(0.7*x[1]*direction[0])
+        // + Math.sin(0.25*x[1]*direction[0])
+      }
+    });
+}
+// /**
+//  * slopeRiver ... create a sloping height map
+//  *
+//  * @param	mesh
+//  * @param	imposed slope gradient
+//  */
+// function slopeRiver(mesh, direction) {
+//     return mesh.map(function (x) {
+//         if (x[0] < 0) {
+//
+//           return Math.pow(x[0]*-1*direction[0],1) - 8*Math.cos(x[1]*direction[1]);
+//         } else {
+//
+//           return Math.pow(x[0]*direction[0],1) + 8*Math.cos(x[1]*direction[1]);
+//         }
+//     });
+// }
+
+//
+// /**
+//  * slope ... create a sloping height map
+//  *
+//  * @param	mesh
+//  * @param	imposed slope gradient
+//  */
+// function slopeRiver(mesh, direction) {
+//     return mesh.map(function (x) {
+//       if (x[0] < 0) {
+//         return -(x[0]*direction[0] + 2*Math.cos(x[1]*direction[1]));
+//       } else {
+//         return x[0]*direction[0] + 2*Math.cos(x[1]*direction[1]);
+//       }
+//     });
+// }
+
 /**
  * slope ... create a sloping height map
- * 
+ *
  * @param	mesh
  * @param	imposed slope gradient
  */
 function slope(mesh, direction) {
     return mesh.map(function (x) {
-        return x[0] * direction[0] + x[1] * direction[1];
+        return   x[0]*direction[0] + x[1]*direction[1]
     });
 }
 
@@ -99,7 +160,7 @@ function spiky(h) {
 }
 
 /**
- * downhill - construct/return a 
+ * downhill - construct/return a
  *
  * @param	height map
  * @return	list <x,y> of most down-hill neigtbor of every point
@@ -256,7 +317,7 @@ function ridges(mesh, n, r1, r2) {
     n = n || 5;
     r1 = r1 || 0.02;
     r2 = r2 || 20;
-    
+
     // choose a center location for the ridges
     var cent = [((Math.random() - 0.5) * 0.5), ((Math.random() - 0.5) * 0.5)];
     var angle = Math.random() * 2 * Math.PI;
@@ -277,7 +338,7 @@ function ridges(mesh, n, r1, r2) {
         for (var j = 0; j < ridgeLength; j++) {
             var thisAngle = ridgeangle + (Math.random() - 0.5) * Math.PI * 0.1;
             var cheatw = (Math.random() - 0.5) * r1 * 0.5;
-            var cheath = (Math.random() - 0.5) * r1 * 0.5;        
+            var cheath = (Math.random() - 0.5) * r1 * 0.5;
             var wdist = r1 * (j - r2/2) + (Math.random() - 0.5) * r1 * 0.5;
             var hdist = r1 * (j - r2/2) + (Math.random() - 0.5) * r1 * 0.5;
             mounts.push([ridgecent[0] + Math.cos(thisAngle) * wdist + cheatw, ridgecent[1] + Math.sin(thisAngle) * hdist + cheath]);
@@ -300,7 +361,7 @@ function ridges(mesh, n, r1, r2) {
 
 /**
  * relax ... average with neighbors to smoothe terrain
- * 
+ *
  * @param	height map
  * @return	new height map
  */
@@ -369,7 +430,8 @@ function visualizeVoronoi(svg, field, lo, hi) {
     var mappedvals = field.map(function (x) {return x > hi ? 1 : x < lo ? 0 : (x - lo) / (hi - lo)});
 
     // remove all existing field path lines
-    var tris = svg.selectAll('path.field').data(field.mesh.tris)
+    var tris = svg.selectAll('path.field').data(field.mesh.tris);
+    var threeQuarters = d3.quantile(mappedvals, 0.75);
     tris.enter()
         .append('path')
         .classed('field', true);
@@ -380,7 +442,11 @@ function visualizeVoronoi(svg, field, lo, hi) {
     //	using the Veridis value-to-color mapping
     svg.selectAll('path.field')
         .attr('d', makeD3Path)
-        .style('fill', function (d, i) {
-            return d3.interpolateViridis(mappedvals[i]);
-        });
+        .classed('sea', function(e, i) { return mappedvals[i] === 0; })
+        // .classed('land', function(e, i) { return mappedvals[i] === 0; })
+        // .classed('land', function(e, i) { return mappedvals[i] > threeQuarters; })
+        // .style('fill', function (d, i) {
+        //   return d3.interpolateViridis(mappedvals[i]);
+        // });
+
 }

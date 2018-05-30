@@ -21,14 +21,18 @@ function addSVG(div, h, w) {
     return div.insert("svg", ":first-child")
         .attr("height", h)
         .attr("width", w)
-        .attr("viewBox", "-500 -500 1000 1000");
+        .attr("viewBox", "-470 -430 950 950")
+        // .attr("preserveAspectRatio","xMidYMid meet");
 }
 
 /**
  * main editing window
  */
 var mainDiv = d3.select("div#main");
-var mainSVG = addSVG(mainDiv, 500, 500);
+
+
+var mainSVG = addSVG(mainDiv, 500*defaultExtent.height, 500*defaultExtent.width);
+
 var mainRender = {
     params: defaultParams,
     h: zero(generateGoodMesh(defaultParams.npts, defaultExtent)),
@@ -99,7 +103,7 @@ mainDiv.append("button")
     .text("Reset to flat")
     .on("click", function () {
         mainRender.cities = [];
-        mainRender.h = zero(mainRender.h.mesh); 
+        mainRender.h = zero(mainRender.h.mesh);
         mainDraw();
     });
 mainDiv.append("h3")
@@ -143,7 +147,8 @@ mainDiv.append("button")
 mainDiv.append("button")
     .text("Add new city")
     .on("click", function () {
-        placeCity(mainRender);
+        // placeCity(mainRender);
+        placeCities(mainRender);
         mainDraw();
     });
 mainDiv.append("h3")
@@ -203,7 +208,10 @@ mainDiv.append("button")
     .on("click", function () {
         mainRender.cities = [];
         mainRender.h = generateCoast(defaultParams);
-        mainDraw();
+        mainDraw(mainSVG);
+        // mainDraw(mainSVG2);
+        // mainDraw(mainSVG3);
+
     });
 mainDiv.append("button")
     .text("Generate mountains")

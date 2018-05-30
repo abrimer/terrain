@@ -1,8 +1,27 @@
 "use strict";
 
+// DEFAULT PARAMS
+var defaultParams = {
+    extent: defaultExtent,
+    generator: generateCoast,
+    npts: 32768/2,
+    ncities: 30,
+    nterrs: 6,
+    fontsizes: {
+        region: 40,
+        city: 25,
+        town: 20
+    }
+}
+
+var defaultExtent = {
+    width: 1,
+    height: 1.5
+};
+
 /**
  * runif: random number within a range
- * 
+ *
  * @param lo	low end of range
  * @param hi	high end of range
  * @return	number between lo and hi
@@ -12,9 +31,9 @@ function runif(lo, hi) {
 }
 
 /**
- * rnorm - (kinky) random vector generation
+ * rnorm - random vector generation
  *
- *	This routine is meant to be called twice, and returns 
+ *	This routine is meant to be called twice, and returns
  *	first an X coordinate, and then a Y coordiante.
  */
 var rnorm = (function () {
@@ -47,7 +66,7 @@ var rnorm = (function () {
 
 /**
  * randomVector - generate a random vector
- * 
+ *
  * @param	maximum size
  * @return	<x,y> coordinate
  */
@@ -55,10 +74,7 @@ function randomVector(scale) {
     return [scale * rnorm(), scale * rnorm()];
 }
 
-var defaultExtent = {
-    width: 1,
-    height: 1
-};
+
 
 
 function cleanCoast(h, iters) {
@@ -75,7 +91,7 @@ function cleanCoast(h, iters) {
                 if (h[nbs[j]] > 0) {
                     count++;
                 } else if (h[nbs[j]] > best) {
-                    best = h[nbs[j]];    
+                    best = h[nbs[j]];
                 }
             }
             if (count > 1) continue;
@@ -247,16 +263,21 @@ function dropEdge(h, p) {
 function generateCoast(params) {
     var mesh = generateGoodMesh(params.npts, params.extent);
     var h = add(
-            slope(mesh, randomVector(4)),
-            cone(mesh, runif(-1, -1)),
-            mountains(mesh, 50)
+            slopeRiver(mesh, [10,0]),
+            // slopeRiver(mesh, [10,0]),
+            //Changed randomVector(4)
+            // cone(mesh, runif(-.5, -.5)),
+            // ridges(mesh, runif(3,7), runif(0.02, 0.05), runif(5,15)),
+            mountains(mesh, 80)
             );
     for (var i = 0; i < 10; i++) {
         h = relax(h);
     }
     h = peaky(h);
-    h = doErosion(h, runif(0, 0.1), 5);
-    h = setSeaLevel(h, runif(0.2, 0.6));
+    // h = doErosion(h, runif(0, 0.1), 5);
+    h = doErosion(h, runif(0.15,0.15), 5);
+    // h = setSeaLevel(h, runif(0.2, 0.6));
+    h = setSeaLevel(h, runif(0.4, 0.4));
     h = fillSinks(h);
     h = cleanCoast(h, 3);
     return h;
@@ -265,7 +286,8 @@ function generateCoast(params) {
 function generateFjord(params) {
     var mesh = generateGoodMesh(params.npts, params.extent);
     var h = add(
-            slope(mesh, randomVector(4)),
+            slope(mesh, [4,0]),
+            //Changed randomVector(4)
             cone(mesh, runif(-1, -1)),
             ridges(mesh, runif(3,7), runif(0.02, 0.05), runif(5,15)),
             mountains(mesh, 30)
@@ -285,7 +307,7 @@ function generateMountain(params) {
     var mesh = generateGoodMesh(params.npts, params.extent);
     var h = add(
             slope(mesh, randomVector(4)),
-            cone(mesh, runif(-1, -1)),
+            // cone(mesh, runif(-1, -1)),
             mountains(mesh, 50)
             );
     for (var i = 0; i < 5; i++) {
@@ -448,7 +470,7 @@ function drawLabels(svg, render, newLang = false) {
             if (terr[j] != city) score -= 3000;
             for (var k = 0; k < cities.length; k++) {
                 var u = h.mesh.vxs[cities[k]];
-                if (Math.abs(v[0] - u[0]) < sx && 
+                if (Math.abs(v[0] - u[0]) < sx &&
                     Math.abs(v[1] - sy/2 - u[1]) < sy) {
                     score -= k < nterrs ? 4000 : 500;
                 }
@@ -479,10 +501,10 @@ function drawLabels(svg, render, newLang = false) {
             }
         }
         reglabels.push({
-            text: text, 
-            x: h.mesh.vxs[best][0], 
-            y: h.mesh.vxs[best][1], 
-            size:sy, 
+            text: text,
+            x: h.mesh.vxs[best][0],
+            y: h.mesh.vxs[best][1],
+            size:sy,
             width:sx
         });
     }
@@ -507,6 +529,7 @@ function drawMap(svg, render) {
     render.coasts = contour(render.h, 0);
     render.terr = getTerritories(render);
     render.borders = getBorders(render);
+    visualizeVoronoi(svg, render.h, 0);
     drawPaths(svg, 'river', render.rivers);
     drawPaths(svg, 'coast', render.coasts);
     drawPaths(svg, 'border', render.borders);
@@ -521,26 +544,12 @@ function doMap(svg, params) {
     };
     var width = svg.attr('width');
     svg.attr('height', width * params.extent.height / params.extent.width);
-    svg.attr('viewBox', -1000 * params.extent.width/2 + ' ' + 
-                        -1000 * params.extent.height/2 + ' ' + 
-                        1000 * params.extent.width + ' ' + 
+    svg.attr('viewBox', -1000 * params.extent.width/2 + ' ' +
+                        -1000 * params.extent.height/2 + ' ' +
+                        1000 * params.extent.width + ' ' +
                         1000 * params.extent.height);
     svg.selectAll().remove();
     render.h = params.generator(params);
     placeCities(render);
     drawMap(svg, render);
 }
-
-var defaultParams = {
-    extent: defaultExtent,
-    generator: generateCoast,
-    npts: 32768,
-    ncities: 5,
-    nterrs: 2,
-    fontsizes: {
-        region: 40,
-        city: 25,
-        town: 20
-    }
-}
-
