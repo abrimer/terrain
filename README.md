@@ -1,8 +1,7 @@
-# Why?
+# Infinite River Project
 
-This is a fork of Martin O'Leary's very interesting work with usability enhancements by Mark Kampe. I made this fork because I want to make savable maps I can create from presets and adjust on the fly.
+This is a fork of Martin O'Leary's very interesting work with usability enhancements by Mark Kampe and Dane Bell. This fork is for creating an infinitely long river.
 
-In order to save the svg, I recommend NYT's [crowbar bookmarklet](http://nytimes.github.io/svg-crowbar/).
 
 # Original Creator Information and License
 
@@ -20,4 +19,6 @@ If you do make something interesting with this code, please do still let me know
 [uncharted]: https://twitter.com/unchartedatlas
 [notes]: https://mewo2.com/notes/terrain/
 [license]: https://github.com/mewo2/terrain/blob/master/LICENSE.md
+
+In order to save the svg, I recommend NYT's [crowbar bookmarklet](http://nytimes.github.io/svg-crowbar/).
 
