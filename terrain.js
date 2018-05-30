@@ -263,6 +263,25 @@ function dropEdge(h, p) {
 function generateCoast(params) {
     var mesh = generateGoodMesh(params.npts, params.extent);
     var h = add(
+            slope(mesh, randomVector(4)),
+            cone(mesh, runif(-.5, -.5)),
+            mountains(mesh, 40)
+            );
+    for (var i = 0; i < 10; i++) {
+        h = relax(h);
+    }
+    h = peaky(h);
+    h = doErosion(h, runif(0, 0.1), 5);
+    // h = doErosion(h, runif(0.15,0.15), 5);
+    h = setSeaLevel(h, runif(0.2, 0.6));
+    h = fillSinks(h);
+    h = cleanCoast(h, 3);
+    return h;
+}
+
+function generateRiver(params) {
+    var mesh = generateGoodMesh(params.npts, params.extent);
+    var h = add(
             slopeRiver(mesh, [10,0]),
             // slopeRiver(mesh, [10,0]),
             //Changed randomVector(4)

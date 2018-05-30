@@ -197,6 +197,15 @@ mainDiv.append("button")
 mainDiv.append("h3")
     .text("Presets")
 mainDiv.append("button")
+    .text("GENERATE RIVER SEGMENT")
+    .on("click", function () {
+      mainRender.cities = [];
+      mainRender.h = generateRiver(defaultParams);
+      mainDraw(mainSVG);
+      // mainDraw(mainSVG2);
+      // mainDraw(mainSVG3);
+    });
+mainDiv.append("button")
     .text("Generate fjords")
     .on("click", function () {
         mainRender.cities = [];
@@ -204,14 +213,11 @@ mainDiv.append("button")
         mainDraw();
     });
 mainDiv.append("button")
-    .text("Generate coast")
+    .text("Generate Coast")
     .on("click", function () {
         mainRender.cities = [];
         mainRender.h = generateCoast(defaultParams);
         mainDraw(mainSVG);
-        // mainDraw(mainSVG2);
-        // mainDraw(mainSVG3);
-
     });
 mainDiv.append("button")
     .text("Generate mountains")
