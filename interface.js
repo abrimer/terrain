@@ -21,7 +21,7 @@ function addSVG(div, h, w) {
     return div.insert("svg", ":first-child")
         .attr("height", h)
         .attr("width", w)
-        .attr("viewBox", "-470 -430 950 950")
+        .attr("viewBox", "-500 -500 1000 1000")
         // .attr("preserveAspectRatio","xMidYMid meet");
 }
 
@@ -145,7 +145,7 @@ mainDiv.append("button")
         mainDraw();
     });
 mainDiv.append("button")
-    .text("Add new city")
+    .text("ADD CITIES")
     .on("click", function () {
         // placeCity(mainRender);
         placeCities(mainRender);
@@ -196,12 +196,21 @@ mainDiv.append("button")
     });
 mainDiv.append("h3")
     .text("Presets")
+
+// RIVER GENERATION
 mainDiv.append("button")
     .text("GENERATE RIVER SEGMENT")
     .on("click", function () {
       mainRender.cities = [];
-      mainRender.h = generateRiver(defaultParams);
-      mainDraw(mainSVG);
+      var riverGen = generateRiver(defaultParams);
+
+      mainRender.h = riverGen[0];
+      mainRender.bounds = riverGen[1];
+      console.log(mainRender);
+      drawPaths(mainSVG, "bounds", mainRender.bounds);
+      // visualizeBounds(mainSVG, mainRender);
+
+      mainDraw();
       // mainDraw(mainSVG2);
       // mainDraw(mainSVG3);
     });

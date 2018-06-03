@@ -39,15 +39,13 @@ function randArb(min, max) {
 function slopeRiver(mesh, direction) {
     return mesh.map(function (x) {
       if (x[0] < 0) {
-        return Math.pow(1.75*x[0]*-direction[0],1)
+        return Math.pow(10*x[0]*-direction[0],1/2)
         - Math.sin(x[1]*direction[0])
         - Math.sin(0.7*x[1]*direction[0])
-        // return Math.pow(x[0]*-direction[0],1) - Math.cos(x[1]*direction[0])
       } else {
-        return Math.pow(1.75*x[0]*direction[0],1)
+        return Math.pow(10*x[0]*direction[0],1/2)
         + Math.sin(x[1]*direction[0])
         + Math.sin(0.7*x[1]*direction[0])
-        // + Math.sin(0.25*x[1]*direction[0])
       }
     });
 }

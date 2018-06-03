@@ -41,7 +41,7 @@ function cityScore(h, cities) {
 
 /**
  * placeCity -	compute scores and place a city in the best location
- * 
+ *
  * @param	world map and parameters
  * 		updates cities list in world map
  */
@@ -72,7 +72,7 @@ function placeCities(render) {
  *
  *	Recursively compute the cost of travel outwards
  *	from city, and assign ownership to the most easily
- *	reached capitol (using Priority Queues to ensure
+ *	reached capital (using Priority Queues to ensure
  *	that the easiest option is assigned first)
  *
  * @param	world map and parameters
@@ -218,6 +218,7 @@ function visualizeCities(svg, render) {
         .raise();
 }
 
+
 /**
  * terrCenter - find centroid of teritory
  *	average the x/y coordinates of every point in territory
@@ -241,4 +242,3 @@ function terrCenter(h, terr, city, landOnly) {
     }
     return [x/n, y/n];
 }
-

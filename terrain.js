@@ -4,8 +4,8 @@
 var defaultParams = {
     extent: defaultExtent,
     generator: generateCoast,
-    npts: 32768/2,
-    ncities: 30,
+    npts: 32768/8,
+    ncities: 24,
     nterrs: 6,
     fontsizes: {
         region: 40,
@@ -260,6 +260,50 @@ function dropEdge(h, p) {
     return newh;
 }
 
+function getBoundaries(currentMesh) {
+  var meshSize = currentMesh.mesh.vxs.length;
+  var aspectRatio = defaultExtent.height/defaultExtent.width;
+  var columnSize = Math.round(Math.sqrt(meshSize/(1/aspectRatio)));
+  var rowSize = Math.round(Math.sqrt(meshSize/aspectRatio));
+
+  var sortedMesh = currentMesh.mesh.vxs.slice().sort(sortByY);
+  var firstRow = sortedMesh.slice(0,rowSize).sort(sortByX);
+  var lastRow = sortedMesh.slice(meshSize - rowSize).sort(sortByX);
+  return [firstRow, lastRow];
+}
+
+
+
+function sortByY(a, b){
+  if (a[1] == b[1]) return a[0] - b[0];
+  return a[1] - b[1];
+}
+
+function sortByX(a, b){
+  if (a[0] == b[0]) return a[1] - b[1];
+  return a[0] - b[0];
+}
+
+function generateRiver(params) {
+    var mesh = generateGoodMesh(params.npts, params.extent);
+    var h = add(
+            slopeRiver(mesh, [10,0]),
+            mountains(mesh, 80)
+            );
+    for (var i = 0; i < 10; i++) {
+        h = relax(h);
+    }
+    h = peaky(h);
+    var bounds = getBoundaries(h);
+    // h = doErosion(h, runif(0, 0.1), 5);
+    h = doErosion(h, runif(0.15,0.15), 5);
+    // h = setSeaLevel(h, runif(0.2, 0.6));
+    h = setSeaLevel(h, runif(0.4, 0.4));
+    h = fillSinks(h);
+    h = cleanCoast(h, 3);
+    return [h, bounds];
+}
+
 function generateCoast(params) {
     var mesh = generateGoodMesh(params.npts, params.extent);
     var h = add(
@@ -274,29 +318,6 @@ function generateCoast(params) {
     h = doErosion(h, runif(0, 0.1), 5);
     // h = doErosion(h, runif(0.15,0.15), 5);
     h = setSeaLevel(h, runif(0.2, 0.6));
-    h = fillSinks(h);
-    h = cleanCoast(h, 3);
-    return h;
-}
-
-function generateRiver(params) {
-    var mesh = generateGoodMesh(params.npts, params.extent);
-    var h = add(
-            slopeRiver(mesh, [10,0]),
-            // slopeRiver(mesh, [10,0]),
-            //Changed randomVector(4)
-            // cone(mesh, runif(-.5, -.5)),
-            // ridges(mesh, runif(3,7), runif(0.02, 0.05), runif(5,15)),
-            mountains(mesh, 80)
-            );
-    for (var i = 0; i < 10; i++) {
-        h = relax(h);
-    }
-    h = peaky(h);
-    // h = doErosion(h, runif(0, 0.1), 5);
-    h = doErosion(h, runif(0.15,0.15), 5);
-    // h = setSeaLevel(h, runif(0.2, 0.6));
-    h = setSeaLevel(h, runif(0.4, 0.4));
     h = fillSinks(h);
     h = cleanCoast(h, 3);
     return h;

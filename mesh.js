@@ -47,7 +47,7 @@ function generatePoints(n, extent) {
 }
 
 /**
- * centroid - centroid of 
+ * centroid - centroid of
  * @param	set of <x,y> points
  * @return	<x,y> centroid coordinates
  */
@@ -132,7 +132,7 @@ function makeMesh(pts, extent) {
     var vor = voronoi(pts, extent);
     var vxs = [];	// vertex locations
     var vxids = {};	// vertex ID #s
-    var adj = [];	// adjacent vertices	
+    var adj = [];	// adjacent vertices
     var edges = [];	// list of vertex IDs and positions
     var tris = [];	// coordinates of neighbors of this vertex
 
@@ -145,7 +145,7 @@ function makeMesh(pts, extent) {
 	// lookup (or assign) their vertex IDs
         var e0 = vxids[e[0]];
         if (e0 == undefined) {
-            e0 = vxs.length;	
+            e0 = vxs.length;
             vxids[e[0]] = e0;
             vxs.push(e[0]);
         }
@@ -184,7 +184,7 @@ function makeMesh(pts, extent) {
         adj: adj,	// indices of neighbors
         tris: tris,	// coordinates of neighbors
         edges: edges,	// the set of all edges
-        extent: extent	// the scale 
+        extent: extent	// the scale
     }
 
     /*
@@ -219,7 +219,7 @@ function generateGoodMesh(n, extent) {
  * @param	index of point of interest
  * @return	true ... point is on the edge
  *
- * In the final (triangular) grid points on the edge have 
+ * In the final (triangular) grid points on the edge have
  * only two neighbors, while internal points have 3 or more.
  */
 function isedge(mesh, i) {
@@ -275,8 +275,8 @@ function distance(mesh, i, j) {
 
 /**
  * visualizePoints - plot points on a map
- *	
- * @param	SVG field 
+ *
+ * @param	SVG field
  *		(1000x1000, centered <0,0>)
  * @param	list of <x,y> coordinates
  *		in range <-0.5,-0.5> to <0.5,0.5>
