@@ -21,6 +21,8 @@
 		<script src="https://d3js.org/d3.v4.min.js"></script>
 		<script src="http://cdn.rawgit.com/adamhooper/js-priority-queue/master/priority-queue.js"></script>
 		<script src="http://cdn.rawgit.com/mewo2/naming-language/master/language.js"></script>
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/seedrandom/2.4.3/seedrandom.min.js">
+		</script>
 
 		<style>
 		    path, line {
@@ -39,7 +41,7 @@
 		    }
 
 		    .river {
-		    stroke: #223366;
+		  stroke: #223366;
 			stroke-width: 2;
 		    }
 
@@ -49,20 +51,22 @@
 
 				.bounds {
 			stroke-width: 6;
+			stroke: green;
+			stroke-linecap: butt;
 		    }
 
 				.sea {
-					stroke: #0f5e9c;
-					fill: #0f5e9c;
+			stroke: #0f5e9c;
+			fill: #0f5e9c;
 				}
 
 				.land {
 					/* stroke: #228B22; */
-					fill: #228B22;
+			fill: #228B22;
 				}
 
 		    .border {
-		    stroke: #666;
+		  stroke: #666;
 			stroke-width: 5;
 			stroke-dasharray: 4,4;
 			stroke-linecap: butt;
@@ -88,6 +92,9 @@
 		    }
 		</style>
 
+		<!-- create the display divisions used in the demo -->
+		<div class="example" id="main"></div>
+
 		<!-- modules of the terrain generator -->
 		<script src="./mesh.js"></script>
 		<script src="./height.js"></script>
@@ -95,8 +102,6 @@
 		<script src="./cities.js"></script>
 		<script src="./terrain.js"></script>
 
-		<!-- create the display divisions used in the demo -->
-		<div class="example" id="main"></div>
 
 		<!-- populate them with rendering controls -->
 		<script src="./interface.js"></script>

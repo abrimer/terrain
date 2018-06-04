@@ -39,13 +39,17 @@ function randArb(min, max) {
 function slopeRiver(mesh, direction) {
     return mesh.map(function (x) {
       if (x[0] < 0) {
-        return Math.pow(10*x[0]*-direction[0],1/2)
-        - Math.sin(x[1]*direction[0])
-        - Math.sin(0.7*x[1]*direction[0])
+        return Math.pow(100*x[0]*-direction[0],1/2) + 10*x[0]*-direction[0]
+        - (Math.sin(2*x[1]*direction[0])
+        + Math.sin(7*x[1]*direction[0])
+        + Math.sin(15*x[1]*direction[0])
+        + Math.sin(18*x[1]*direction[0]))
       } else {
-        return Math.pow(10*x[0]*direction[0],1/2)
-        + Math.sin(x[1]*direction[0])
-        + Math.sin(0.7*x[1]*direction[0])
+        return Math.pow(100*x[0]*direction[0],1/2) + 10*x[0]*direction[0]
+        + (Math.sin(2*x[1]*direction[0])
+        + Math.sin(7*x[1]*direction[0])
+        + Math.sin(15*x[1]*direction[0])
+        + Math.sin(18*x[1]*direction[0]))
       }
     });
 }
@@ -284,7 +288,7 @@ function mountains(mesh, n, r) {
     // choose a center location for each desired mountain
     var mounts = [];
     for (var i = 0; i < n; i++) {
-        mounts.push([mesh.extent.width * (Math.random() - 0.5), mesh.extent.height * (Math.random() - 0.5)]);
+        mounts.push([mesh.extent.width * (runif(0,1) - 0.5), mesh.extent.height * (Math.random() - 0.5)]);
     }
 
     var newvals = zero(mesh);

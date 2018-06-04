@@ -4,37 +4,51 @@ body {
 }
 
 div.note {
-    padding: 1em;
-    margin: 1em;
-    margin-left: auto;
-    margin-right: auto;
-    width: 900px;
-    clear: both;
-    overflow: auto;
+    /* padding: 1em; */
+    /* margin: 1em; */
+    /* margin-left: auto; */
+    /* margin-right: auto; */
+    /* width: 900px; */
+    /* clear: both; */
+    /* overflow: auto; */
     background-color: white;
 }
 
 div.example {
-    margin: 0.5em;
-    padding: 1em;
+    /* margin: 0.5em; */
+    /* padding: 1em; */
     background-color: #eee;
-    clear: both;
-    overflow: auto;
+    /* clear: both; */
+    /* overflow: auto; */
+}
+
+svg {
+  /* position: absolute; */
+  /* float: left; */
+  display: block;
+  height: 100%;
+  width: 100%;
+  /* height: auto; */
+  margin-left: auto;
+  margin-right: auto;
 }
 
 button {
     font-size: large;
-    background-color: white;
-    color: black;
+    background-color: #02cc86;
+    color: white;
+    padding: 10px;
     border-radius: 0.5rem;
     border: 1px solid black;
     margin-right: 0.5rem;
     margin-bottom: 0.5rem;
+    /* float: left; */
+    width: 100%;
 }
 
 button:hover {
-    background-color: black;
-    color: white;
+    background-color: white;
+    color: black;
 }
 
 

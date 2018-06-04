@@ -29,8 +29,8 @@ function cityScore(h, cities) {
         }
 	// maximize distance from center of map
         score[i] += 0.01 / (1e-9 + Math.abs(h.mesh.vxs[i][0]) - h.mesh.extent.width/2)
-        score[i] += 0.01 / (1e-9 + Math.abs(h.mesh.vxs[i][1]) - h.mesh.extent.height/2)
-
+        // Added to score if city was near center of map to prevent cities near bounds
+        score[i] -= 0.01 / (1e-9 + Math.abs(h.mesh.vxs[i][1]) - h.mesh.extent.height/2)
 	// maximize distance from other cities
         for (var j = 0; j < cities.length; j++) {
             score[i] -= 0.02 / (distance(h.mesh, cities[j], i) + 1e-9);
@@ -206,12 +206,12 @@ function visualizeCities(svg, render) {
     circs.exit()
             .remove();
 
-    // larger circles for capitols
+    // larger circles for capitals
     svg.selectAll('circle.city')
         .attr('cx', function (d) {return 1000*h.mesh.vxs[d][0]})
         .attr('cy', function (d) {return 1000*h.mesh.vxs[d][1]})
-        .attr('r', function (d, i) {return i >= n ? 4 : 10})
-        .style('fill', 'white')
+        .attr('r', function (d, i) {return i >= n ? 6 : 14})
+        .style('fill', function (d, i) {return i >= n ? 'black' : 'gold'})
         .style('stroke-width', 5)
         .style('stroke-linecap', 'round')
         .style('stroke', 'black')
