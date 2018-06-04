@@ -1,24 +1,5 @@
 "use strict";
 
-// DEFAULT PARAMS
-var defaultParams = {
-    extent: defaultExtent,
-    generator: generateCoast,
-    npts: 32768/2,
-    ncities: 30,
-    nterrs: 6,
-    fontsizes: {
-        region: 40,
-        city: 25,
-        town: 20
-    }
-}
-
-var defaultExtent = {
-    width: 1,
-    height: 1.5
-};
-
 /**
  * runif: random number within a range
  *
@@ -27,7 +8,7 @@ var defaultExtent = {
  * @return	number between lo and hi
  */
 function runif(lo, hi) {
-    return lo + Math.random() * (hi - lo);
+    return lo + newRand() * (hi - lo);
 }
 
 /**
@@ -128,7 +109,7 @@ function contour(h, level) {
     for (var i = 0; i < h.mesh.edges.length; i++) {
         var e = h.mesh.edges[i];
         if (e[3] == undefined) continue;
-        if (isnearedge(h.mesh, e[0]) || isnearedge(h.mesh, e[1])) continue;
+        // if (isnearedge(h.mesh, e[0]) || isnearedge(h.mesh, e[1])) continue;
         if ((h[e[0]] > level && h[e[1]] <= level) ||
             (h[e[1]] > level && h[e[0]] <= level)) {
             edges.push([e[2], e[3]]);
@@ -205,7 +186,7 @@ function visualizeSlopes(svg, render) {
     var strokes = [];
     var r = 0.25 / Math.sqrt(h.length);
     for (var i = 0; i < h.length; i++) {
-        if (h[i] <= 0 || isnearedge(h.mesh, i)) continue;
+        if (h[i] <= 0) continue;
         var nbs = neighbours(h.mesh, i);
         nbs.push(i);
         var s = 0;
@@ -260,6 +241,70 @@ function dropEdge(h, p) {
     return newh;
 }
 
+function getBoundaries(currentMesh) {
+  var meshSize = currentMesh.mesh.vxs.length;
+  var aspectRatio = defaultExtent.height/defaultExtent.width;
+  var columnSize = Math.round(Math.sqrt(meshSize/(1/aspectRatio)));
+  var rowSize = Math.round(Math.sqrt(meshSize/aspectRatio));
+
+  var sortedMesh = currentMesh.mesh.vxs.slice().sort(sortByY);
+  var firstRow = sortedMesh.slice(0,rowSize).sort(sortByX);
+  var lastRow = sortedMesh.slice(meshSize - rowSize).sort(sortByX);
+  return [firstRow, lastRow];
+}
+
+
+
+function sortByY(a, b){
+  if (a[1] == b[1]) return a[0] - b[0];
+  return a[1] - b[1];
+}
+
+function sortByX(a, b){
+  if (a[0] == b[0]) return a[1] - b[1];
+  return a[0] - b[0];
+}
+
+// DEFAULT PARAMS
+var defaultParams = {
+    extent: defaultExtent,
+    generator: generateCoast,
+    npts: 32768/2,
+    ncities: 24,
+    nterrs: 6,
+    fontsizes: {
+        region: 40,
+        city: 25,
+        town: 20
+    }
+}
+
+var defaultExtent = {
+    width: 1,
+    height: 1.5
+};
+
+
+function generateRiver(params) {
+    var mesh = generateGoodMesh(params.npts, params.extent);
+    var h = add(
+            slopeRiver(mesh, [1,0]),
+            mountains(mesh, 80)
+            );
+    for (var i = 0; i < 10; i++) {
+        h = relax(h);
+    }
+    h = peaky(h);
+    var bounds = getBoundaries(h);
+    // h = doErosion(h, runif(0, 0.1), 5);
+    h = doErosion(h, runif(0.15,0.15), 5);
+    // h = setSeaLevel(h, runif(0.2, 0.6));
+    h = setSeaLevel(h, runif(0.4, 0.4));
+    h = fillSinks(h);
+    h = cleanCoast(h, 3);
+    return [h, bounds];
+}
+
 function generateCoast(params) {
     var mesh = generateGoodMesh(params.npts, params.extent);
     var h = add(
@@ -274,29 +319,6 @@ function generateCoast(params) {
     h = doErosion(h, runif(0, 0.1), 5);
     // h = doErosion(h, runif(0.15,0.15), 5);
     h = setSeaLevel(h, runif(0.2, 0.6));
-    h = fillSinks(h);
-    h = cleanCoast(h, 3);
-    return h;
-}
-
-function generateRiver(params) {
-    var mesh = generateGoodMesh(params.npts, params.extent);
-    var h = add(
-            slopeRiver(mesh, [10,0]),
-            // slopeRiver(mesh, [10,0]),
-            //Changed randomVector(4)
-            // cone(mesh, runif(-.5, -.5)),
-            // ridges(mesh, runif(3,7), runif(0.02, 0.05), runif(5,15)),
-            mountains(mesh, 80)
-            );
-    for (var i = 0; i < 10; i++) {
-        h = relax(h);
-    }
-    h = peaky(h);
-    // h = doErosion(h, runif(0, 0.1), 5);
-    h = doErosion(h, runif(0.15,0.15), 5);
-    // h = setSeaLevel(h, runif(0.2, 0.6));
-    h = setSeaLevel(h, runif(0.4, 0.4));
     h = fillSinks(h);
     h = cleanCoast(h, 3);
     return h;

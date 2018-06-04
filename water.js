@@ -103,7 +103,7 @@ function getFlux(h) {
 
     // all cells start out getting equal water
     var idxs = [];
-    var flux = zero(h.mesh); 
+    var flux = zero(h.mesh);
     for (var i = 0; i < h.length; i++) {
         idxs[i] = i;
         flux[i] = 1/h.length;
@@ -189,7 +189,7 @@ function doErosion(h, amount, n) {
  * getRivers - construct water flow paths
  *	threshold water flux is a fraction of the total
  *	rainfall landing above sea-level
- *	
+ *
  * @param	height map
  * @param	threshold water flux
  * @return	list of (relatively smooth) paths
@@ -217,7 +217,7 @@ function getRivers(h, limit) {
             var down = h.mesh.vxs[dh[i]];	// downhill coordinate
             if (h[dh[i]] > 0) {
 		// if above sea level, water flows through this cell
-                links.push([up, down]);	
+                links.push([up, down]);
             } else {
 		// if at sea level, water flows 1/2 way into this cell
                 links.push([up, [(up[0] + down[0])/2, (up[1] + down[1])/2]]);
