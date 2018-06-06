@@ -65,7 +65,8 @@ function mainDraw(mainSVG) {
         drawPaths(mainSVG, "coast", []);
     }
     if (mainViewRivers) {
-        drawPaths(mainSVG, "river", getRivers(mainRender.h, 0.005));
+        drawPaths(mainSVG, "river", getRivers(mainRender.h, 0.0025));
+        // Limit sets threshold above which rivers are visualized
     } else {
         drawPaths(mainSVG, "river", []);
     }

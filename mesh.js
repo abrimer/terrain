@@ -239,7 +239,7 @@ function isnearedge(mesh, i) {
     var y = mesh.vxs[i][1];
     var w = mesh.extent.width;
     var h = mesh.extent.height;
-    return x < -0.45 * w || x > 0.45 * w || y < -0.45 * h || y > 0.45 * h;
+    return x < -0.475 * w || x > 0.475 * w || y < -0.475 * h || y > 0.475 * h;
 }
 
 /**

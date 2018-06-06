@@ -269,7 +269,7 @@ function sortByX(a, b){
 var defaultParams = {
     extent: defaultExtent,
     generator: generateCoast,
-    npts: 32768/2,
+    npts: 32768,
     ncities: 24,
     nterrs: 6,
     fontsizes: {
@@ -281,7 +281,7 @@ var defaultParams = {
 
 var defaultExtent = {
     width: 1,
-    height: 1.5
+    height: 2
 };
 
 
@@ -291,7 +291,7 @@ function generateRiver(params) {
             slopeRiver(mesh, [1,0]),
             mountains(mesh, 80)
             );
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < 5; i++) {
         h = relax(h);
     }
     h = peaky(h);
