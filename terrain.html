@@ -3,7 +3,7 @@
 
 	<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="stylesheet" href="./terrain.css">
-	<title>Terrain Generator</title>
+	<title>Infinite River</title>
 
 	<style type="text/css">
 		:root #content > #center > .dose > .dosesingle,
@@ -17,12 +17,17 @@
 			D3 Voronoi tesselation is used for mesh generation.
 			Priority queues are used to generate territories.
 			Language is used to generate city/region names.
+			Seedrandom is used to create predictable randomness
 			-->
 		<script src="https://d3js.org/d3.v4.min.js"></script>
+		<script src="https://d3js.org/d3-color.v1.min.js"></script>
+		<script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
+		<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
 		<script src="http://cdn.rawgit.com/adamhooper/js-priority-queue/master/priority-queue.js"></script>
 		<script src="http://cdn.rawgit.com/mewo2/naming-language/master/language.js"></script>
 		<script src="http://cdnjs.cloudflare.com/ajax/libs/seedrandom/2.4.3/seedrandom.min.js">
 		</script>
+		<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 
 		<style>
 		    path, line {
@@ -42,7 +47,7 @@
 
 		    .river {
 		  stroke: #2e89ad;
-			stroke-width: 3;
+			stroke-width: 4;
 		    }
 
 		    .coast {
@@ -56,21 +61,27 @@
 		    }
 
 				.sea {
-			stroke: #0f5e9c;
-			fill: #0f5e9c;
+			stroke: #ADD8E6;
+			/* fill: #0f5e9c; */
+			fill: #ADD8E6
 				}
 
 				.land {
 					/* stroke: #228B22; */
-			fill: #228B22;
+			fill: #D9C6A8;
 				}
 
 		    .border {
-		  stroke: #666;
-			stroke-width: 5;
+		  stroke: red;
+			stroke-width: 6;
 			stroke-dasharray: 4,4;
 			stroke-linecap: butt;
 		    }
+
+				svg {
+					/* float: right; */
+					background-color: #90EE90;
+				}
 
 		    text {
 			font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
@@ -86,10 +97,6 @@
 			font-variant: small-caps;
 		    }
 
-		    svg {
-			float: right;
-			background-color: white;
-		    }
 		</style>
 
 		<!-- create the display divisions used in the demo -->
@@ -106,5 +113,15 @@
 		<!-- populate them with rendering controls -->
 		<script src="./interface.js"></script>
 	</div>
+
+	<!-- The Modal -->
+<div id="cityModal" class="modal">
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2 class="modalCityName"></h2>
+  </div>
+</div>
+
 </body>
 </html>

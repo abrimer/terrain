@@ -30,7 +30,7 @@ function cityScore(h, cities) {
 	// maximize distance from center of map
         score[i] += 0.01 / (1e-9 + Math.abs(h.mesh.vxs[i][0]) - h.mesh.extent.width/2)
         // Added to score if city was near center of map to prevent cities near bounds
-        score[i] -= 0.01 / (1e-9 + Math.abs(h.mesh.vxs[i][1]) - h.mesh.extent.height/2)
+        score[i] += 0.01 / (1e-9 + Math.abs(h.mesh.vxs[i][1]) - h.mesh.extent.height/2)
 	// maximize distance from other cities
         for (var j = 0; j < cities.length; j++) {
             score[i] -= 0.02 / (distance(h.mesh, cities[j], i) + 1e-9);
@@ -216,6 +216,26 @@ function visualizeCities(svg, render) {
         .style('stroke-linecap', 'round')
         .style('stroke', 'black')
         .raise();
+
+    // $("circle.city").hover(function() {
+    //   $(this).css("fill", "white");
+    //     }, function(){
+    //   $(this).css("fill", "red");
+    // });
+    // $("circle.city").click(function() {
+    //   $("#cityModal").show();
+    //   $(".modalCityName").text("Test!")
+    // });
+    // $(".close").click(function() {
+    //   $("#cityModal").hide();
+    //   $(".modalCityName").text("Test!")
+    // });
+    // window.onclick = function(event) {
+    //   var modal = document.getElementById('cityModal')
+    //   if (event.target == modal) {
+    //     modal.style.display = "none";
+    //   }
+    // }
 }
 
 

@@ -1,5 +1,48 @@
 "use strict";
 
+// DEFAULT PARAMS
+var defaultParams = {
+    extent: defaultExtent,
+    generator: generateCoast,
+    npts: 32768,
+    ncities: 20,
+    nterrs: 6,
+    fontsizes: {
+        region: 40,
+        city: 25,
+        town: 20
+    }
+}
+
+var defaultExtent = {
+    width: 1,
+    height: 2
+};
+
+
+function generateRiver(params) {
+    var mesh = generateGoodMesh(params.npts, params.extent);
+    var h = add(
+            slopeRiver(mesh, [1,0]),
+            mountains(mesh, 80)
+            );
+    for (var i = 0; i < 5; i++) {
+        h = relax(h);
+    }
+    h = peaky(h);
+    var bounds = getBoundaries(h);
+    // h = doErosion(h, runif(0, 0.1), 5);
+    h = doErosion(h, runif(0.2,0.2), 4);
+    // h = doErosion(h, runif(0.3,0.3), 3);
+
+    // h = setSeaLevel(h, runif(0.2, 0.6));
+    h = setSeaLevel(h, runif(0.4, 0.4));
+    h = fillSinks(h);
+    h = cleanCoast(h, 3);
+    return [h, bounds];
+}
+
+
 /**
  * runif: random number within a range
  *
@@ -265,45 +308,7 @@ function sortByX(a, b){
   return a[0] - b[0];
 }
 
-// DEFAULT PARAMS
-var defaultParams = {
-    extent: defaultExtent,
-    generator: generateCoast,
-    npts: 32768,
-    ncities: 24,
-    nterrs: 6,
-    fontsizes: {
-        region: 40,
-        city: 25,
-        town: 20
-    }
-}
 
-var defaultExtent = {
-    width: 1,
-    height: 2
-};
-
-
-function generateRiver(params) {
-    var mesh = generateGoodMesh(params.npts, params.extent);
-    var h = add(
-            slopeRiver(mesh, [1,0]),
-            mountains(mesh, 80)
-            );
-    for (var i = 0; i < 5; i++) {
-        h = relax(h);
-    }
-    h = peaky(h);
-    var bounds = getBoundaries(h);
-    // h = doErosion(h, runif(0, 0.1), 5);
-    h = doErosion(h, runif(0.15,0.15), 5);
-    // h = setSeaLevel(h, runif(0.2, 0.6));
-    h = setSeaLevel(h, runif(0.4, 0.4));
-    h = fillSinks(h);
-    h = cleanCoast(h, 3);
-    return [h, bounds];
-}
 
 function generateCoast(params) {
     var mesh = generateGoodMesh(params.npts, params.extent);

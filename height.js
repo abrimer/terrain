@@ -39,23 +39,23 @@ function randArb(min, max) {
 function slopeRiver(mesh, direction) {
     return mesh.map(function (x) {
       if (x[0] < 0) {
-        return 10*Math.pow(x[0]*-direction[0],1/2)
+        return 15*Math.pow(x[0]*-direction[0],1/2)
         - 20*x[0]*-direction[0]
         + 80*Math.pow(x[0]*-direction[0],2)
         - (Math.sin(2*x[1]*direction[0])
         + Math.sin(7*x[1]*direction[0])
         + Math.sin(15*x[1]*direction[0])
-        + Math.sin(18*x[1]*direction[0])
-        + 0.2*Math.sin(40*x[1]*direction[0]))
+        + Math.sin(18*x[1]*direction[0]))
+        // + 0.2*Math.sin(40*x[1]*direction[0]))
       } else {
-        return 10*Math.pow(x[0]*direction[0],1/2)
+        return 15*Math.pow(x[0]*direction[0],1/2)
         - 20*x[0]*direction[0]
         + 80*Math.pow(x[0]*direction[0],2)
         + Math.sin(2*x[1]*direction[0])
         + Math.sin(7*x[1]*direction[0])
         + Math.sin(15*x[1]*direction[0])
         + Math.sin(18*x[1]*direction[0])
-        + 0.2*Math.sin(40*x[1]*direction[0])
+        // + 0.2*Math.sin(40*x[1]*direction[0])
       }
     });
 }
@@ -441,7 +441,7 @@ function visualizeVoronoi(svg, field, lo, hi) {
 
     // remove all existing field path lines
     var tris = svg.selectAll('path.field').data(field.mesh.tris);
-    var threeQuarters = d3.quantile(mappedvals, 0.75);
+    // var threeQuarters = d3.quantile(mappedvals, 0.75);
     tris.enter()
         .append('path')
         .classed('field', true);
@@ -455,8 +455,10 @@ function visualizeVoronoi(svg, field, lo, hi) {
         .classed('sea', function(e, i) { return mappedvals[i] === 0; })
         // .classed('land', function(e, i) { return mappedvals[i] === 0; })
         // .classed('land', function(e, i) { return mappedvals[i] > threeQuarters; })
-        // .style('fill', function (d, i) {
-        //   return d3.interpolateViridis(mappedvals[i]);
-        // });
+        .style('fill', function (d, i) {
+          return d3.interpolateYlGn(0.55-mappedvals[i]);
+        });
+
+    $(".sea").css("fill","#ADD8E6");
 
 }

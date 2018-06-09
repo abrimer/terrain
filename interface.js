@@ -21,9 +21,9 @@ function addSVG(div, h, w) {
     return div.insert("svg")
         .attr("height", h)
         .attr("width", w)
-        .attr("viewBox", "-500 -500 1000 1000")
+        .attr("viewBox", "-485 -485 970 970")
         .attr("class","svg")
-        // .attr("preserveAspectRatio","xMinYMin meet");
+        // .attr("preserveAspectRatio","xMidYMid meet");
 }
 
 /**
@@ -39,7 +39,7 @@ var mainRender = {
 };
 
 var mainViewSlope = true;
-var mainViewHeight = false;
+var mainViewHeight = true;
 var mainViewErosion = false;
 var mainViewScore = false;
 var mainViewCoast = true;
@@ -65,7 +65,7 @@ function mainDraw(mainSVG) {
         drawPaths(mainSVG, "coast", []);
     }
     if (mainViewRivers) {
-        drawPaths(mainSVG, "river", getRivers(mainRender.h, 0.0025));
+        drawPaths(mainSVG, "river", getRivers(mainRender.h, 0.004));
         // Limit sets threshold above which rivers are visualized
     } else {
         drawPaths(mainSVG, "river", []);
@@ -88,6 +88,7 @@ function mainDraw(mainSVG) {
         mainRender.coasts = contour(mainRender.h, 0);
         mainRender.terr = getTerritories(mainRender);
         mainRender.borders = getBorders(mainRender);
+        // mainRender.h.style("fill", function(d) { return colorScale(d.value); });
         drawLabels(mainSVG, mainRender);
     } else {
         mainSVG.selectAll('text.region')
@@ -97,6 +98,13 @@ function mainDraw(mainSVG) {
             .text(function (d) {return ""})
             .raise();
     }
+    // //Append a defs (for definition) element to your SVG
+    // var defs = svg.append("defs");
+    //
+    // //Append a linearGradient element to the defs and give it a unique id
+    // var linearGradient = defs.append("linearGradient")
+    //     .attr("id", "linear-gradient");
+
 
     // drawPaths(mainSVG, "bounds", mainRender.bounds); //Draw top and bottom bounds
 
