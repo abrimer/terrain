@@ -111,16 +111,16 @@ function mainDraw(mainSVG) {
 }
 
 
-var randCount = 0;
-var newRand = new Math.seedrandom(randCount);
+var randomSeed = 0;
+// var newRand = new Math.seedrandom(randCount);
+var newRand = new MersenneTwister(randomSeed);
+
 
 // RIVER GENERATION
 mainDiv.append("button")
     .text("GENERATE RIVER")
     .on("click", function () {
       mainRender.cities = [];
-      randCount++;
-      var newRand = new Math.seedrandom(randCount);
       var riverGen = generateRiver(defaultParams);
       mainRender.h = riverGen[0];
       mainRender.bounds = riverGen[1];

@@ -4,7 +4,7 @@
 var defaultParams = {
     extent: defaultExtent,
     generator: generateCoast,
-    npts: 32768,
+    npts: 32768/4,
     ncities: 20,
     nterrs: 6,
     fontsizes: {
@@ -32,8 +32,8 @@ function generateRiver(params) {
     h = peaky(h);
     var bounds = getBoundaries(h);
     // h = doErosion(h, runif(0, 0.1), 5);
-    h = doErosion(h, runif(0.2,0.2), 4);
-    // h = doErosion(h, runif(0.3,0.3), 3);
+    // h = doErosion(h, runif(0.2,0.2), 4);
+    h = doErosion(h, runif(0.3,0.3), 3);
 
     // h = setSeaLevel(h, runif(0.2, 0.6));
     h = setSeaLevel(h, runif(0.4, 0.4));
@@ -51,7 +51,7 @@ function generateRiver(params) {
  * @return	number between lo and hi
  */
 function runif(lo, hi) {
-    return lo + newRand() * (hi - lo);
+    return lo + newRand.random() * (hi - lo);
 }
 
 /**

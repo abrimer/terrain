@@ -456,9 +456,14 @@ function visualizeVoronoi(svg, field, lo, hi) {
         // .classed('land', function(e, i) { return mappedvals[i] === 0; })
         // .classed('land', function(e, i) { return mappedvals[i] > threeQuarters; })
         .style('fill', function (d, i) {
+          // return color(mappedvals[i]);
           return d3.interpolateYlGn(0.55-mappedvals[i]);
         });
 
     $(".sea").css("fill","#ADD8E6");
 
 }
+
+var color = d3.scaleLinear()
+.domain([-0.5, 0.2, 1])
+.range(["green", "yellow", "brown"]);
