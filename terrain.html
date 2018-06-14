@@ -12,7 +12,7 @@
 	</style>
 </head>
 <body>
-	<div class="note">
+	<div id="view" class="note">
 		<!-- Imported modules:
 			D3 Voronoi tesselation is used for mesh generation.
 			Priority queues are used to generate territories.
@@ -77,7 +77,7 @@
 
 				svg {
 					/* float: right; */
-					background-color: #90EE90;
+					/* background-color: #90EE90; */
 				}
 
 		    text {
@@ -96,7 +96,7 @@
 
 		</style>
 
-		<!-- create the display divisions used in the demo -->
+		<!-- display the map -->
 		<div class="example" id="main"></div>
 
 		<!-- modules of the terrain generator -->
@@ -107,11 +107,11 @@
 		<script src="./terrain.js"></script>
 		<script src="./mersennetwister.js"></script>
 
-
-
 		<!-- populate them with rendering controls -->
-		<script src="./interface.js"></script>
+		<script src="./interface.js" href=""></script>
 	</div>
+
+	<!-- <a id="download" download="infinite-river.svg" href="">Download</a> -->
 
 	<!-- The Modal -->
 <div id="cityModal" class="modal">

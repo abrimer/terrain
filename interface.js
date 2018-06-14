@@ -10,6 +10,23 @@
  * subsequently documented by Mark Kampe.
  */
 
+// RANDOM SEED sets all randomness
+ var randomSeed = 0;
+ // var newRand = new Math.seedrandom(randCount);
+ var newRand = new MersenneTwister(randomSeed);
+
+ /**
+  * runif: random number within a range
+  *
+  * @param lo	low end of range
+  * @param hi	high end of range
+  * @return	number between lo and hi
+  */
+ function runif(lo, hi) {
+     return lo + newRand.random() * (hi - lo);
+ }
+
+
 /**
  * addSVG - add a Scalable Vector Graphics pannel to a div
  *
@@ -18,10 +35,16 @@
 function addSVG(div, h, w) {
     h = h || 500
     w = w || 500
-    return div.insert("svg")
+    jQuery('<div/>', {
+      id: 'svg-container',
+    }).appendTo("#main");
+
+    return d3.select("div#svg-container").insert("svg")
         .attr("height", h)
         .attr("width", w)
-        .attr("viewBox", "-485 -485 970 970")
+        // .attr("viewBox", "-485 -485 970 970")
+        .attr("viewBox", "-500 -500 1000 1000")
+
         .attr("class","svg")
         // .attr("preserveAspectRatio","xMidYMid meet");
 }
@@ -98,22 +121,16 @@ function mainDraw(mainSVG) {
             .text(function (d) {return ""})
             .raise();
     }
-    // //Append a defs (for definition) element to your SVG
-    // var defs = svg.append("defs");
-    //
-    // //Append a linearGradient element to the defs and give it a unique id
-    // var linearGradient = defs.append("linearGradient")
-    //     .attr("id", "linear-gradient");
 
 
     // drawPaths(mainSVG, "bounds", mainRender.bounds); //Draw top and bottom bounds
 
+    // $(document).ready(function() {
+    //    $('#download').attr('href', 'data:application/octet-stream;base64,' + btoa($("#svg-container").html()));
+    // });
 }
 
 
-var randomSeed = 0;
-// var newRand = new Math.seedrandom(randCount);
-var newRand = new MersenneTwister(randomSeed);
 
 
 // RIVER GENERATION
@@ -121,10 +138,10 @@ mainDiv.append("button")
     .text("GENERATE RIVER")
     .on("click", function () {
       mainRender.cities = [];
-      var riverGen = generateRiver(defaultParams);
-      mainRender.h = riverGen[0];
-      mainRender.bounds = riverGen[1];
+      mainRender.h = generateRiver(defaultParams);
       mainDraw(addSVG(mainDiv, 500*defaultExtent.height, 500*defaultExtent.width));
+      randomSeed++;
+      newRand = new MersenneTwister(randomSeed);
     });
 
 

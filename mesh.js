@@ -41,10 +41,43 @@ function generatePoints(n, extent) {
     extent = extent || defaultExtent;
     var pts = [];
     for (var i = 0; i < n; i++) {
-        pts.push([(Math.random() - 0.5) * extent.width, (Math.random() - 0.5) * extent.height]);
+        pts.push([(runif(0,1) - 0.5) * extent.width, (runif(0,1) - 0.5) * extent.height]);
     }
+
     return pts;
 }
+
+function generateGrid(n, extent) {
+  extent = extent || defaultExtent;
+  var pts = [];
+  var rowSize = Math.round(Math.sqrt(n/aspectRatio));
+  var columnSize = Math.round(Math.sqrt(n*aspectRatio));
+
+  var halfWidth = 0.5*extent.width;
+  var halfHeight = 0.5*extent.height;
+  var arrX = linSpace(-halfWidth,halfWidth,rowSize);
+  var arrY = linSpace(-halfHeight,halfHeight,columnSize);
+
+  for (var i = 0; i < rowSize; i++) {
+      for (var j = 0; j < columnSize; j++) {
+        pts.push([arrX[i], arrY[j]]);
+
+      }
+  }
+  return pts;
+}
+
+function linSpace(startValue, stopValue, cardinality) {
+  var arr = [];
+  var currValue = startValue;
+  var step = (stopValue - startValue) / (cardinality - 1);
+  for (var i = 0; i < cardinality; i++) {
+    arr.push(Math.round((currValue + (step * i)) * 10000) / 10000);
+  }
+  return arr;
+}
+
+
 
 /**
  * centroid - centroid of
@@ -82,6 +115,24 @@ function improvePoints(pts, n, extent) {
             .polygons(pts)
             .map(centroid);
     }
+
+    pts.sort(function(a, b) {
+      //sort by y, secondary by x
+      return a[1] == b[1] ? a[0] - b[0] : a[1] - b[1];
+    });
+
+
+
+    // if (previousMesh !== undefined) {
+    //   var tempPts = previousMesh.mesh.pts.slice(pts.length - overlapAmount);
+    //   tempPts.forEach(function (item,index,arr) {
+    //       var newItem = [item[0], item[1]-(2-overlap)];
+    //       arr[index] = newItem;
+    //   });
+    //   pts.splice(0,overlapAmount,...tempPts);
+    //   return pts;
+    // }
+
     return pts;
 }
 
@@ -98,9 +149,13 @@ function improvePoints(pts, n, extent) {
 function generateGoodPoints(n, extent) {
     extent = extent || defaultExtent;
     var pts = generatePoints(n, extent);
-    pts = pts.sort(function (a, b) {
-        return a[0] - b[0];
+
+    // pts = sortWithIndices(pts);
+    pts.sort(function(a, b) {
+      //sort by x, secondary by y
+      return a[1] == b[1] ? a[0] - b[0] : a[1] - b[1];
     });
+
     return improvePoints(pts, 1, extent);
 }
 
@@ -209,6 +264,7 @@ function makeMesh(pts, extent) {
 function generateGoodMesh(n, extent) {
     extent = extent || defaultExtent;
     var pts = generateGoodPoints(n, extent);
+    // var pts = generateGrid(n,extent);
     return makeMesh(pts, extent);
 }
 

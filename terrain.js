@@ -4,7 +4,7 @@
 var defaultParams = {
     extent: defaultExtent,
     generator: generateCoast,
-    npts: 32768/4,
+    npts: 32768,
     ncities: 20,
     nterrs: 6,
     fontsizes: {
@@ -18,41 +18,64 @@ var defaultExtent = {
     width: 1,
     height: 2
 };
+var aspectRatio = defaultExtent.height/defaultExtent.width;
+
+
+var previousMesh;
+var overlap = 0.25;
+var overlapAmount = Math.round(defaultParams.npts * overlap);
 
 
 function generateRiver(params) {
     var mesh = generateGoodMesh(params.npts, params.extent);
+
     var h = add(
             slopeRiver(mesh, [1,0]),
+            // slopeNoisyRiver(mesh, [1,0]),
+
             mountains(mesh, 80)
             );
     for (var i = 0; i < 5; i++) {
         h = relax(h);
     }
     h = peaky(h);
-    var bounds = getBoundaries(h);
-    // h = doErosion(h, runif(0, 0.1), 5);
+
+    // h = setSeedRow(h);
+
+    // h = doErosion(h, runif(0.1, 0.1), 5);
     // h = doErosion(h, runif(0.2,0.2), 4);
+    // previousMesh = h.seedRow;
     h = doErosion(h, runif(0.3,0.3), 3);
 
+
+
     // h = setSeaLevel(h, runif(0.2, 0.6));
-    h = setSeaLevel(h, runif(0.4, 0.4));
+    h = setSeaLevel(h, runif(0.35, 0.35));
+
     h = fillSinks(h);
     h = cleanCoast(h, 3);
-    return [h, bounds];
+
+    previousMesh = h;
+
+    return h;
 }
 
 
-/**
- * runif: random number within a range
- *
- * @param lo	low end of range
- * @param hi	high end of range
- * @return	number between lo and hi
- */
-function runif(lo, hi) {
-    return lo + newRand.random() * (hi - lo);
+function setSeedRow(currentMesh) {
+
+  if (previousMesh !== undefined) {
+    var tempMesh = currentMesh.mesh;
+    var tempRow = previousMesh.slice(previousMesh.length - overlapAmount);
+
+    var newMesh = currentMesh.splice(0,overlapAmount,...tempRow);
+    newMesh.mesh = tempMesh;
+    return newMesh;
+  }
+
+  return currentMesh;
 }
+
+
 
 /**
  * rnorm - random vector generation
@@ -284,18 +307,48 @@ function dropEdge(h, p) {
     return newh;
 }
 
-function getBoundaries(currentMesh) {
-  var meshSize = currentMesh.mesh.vxs.length;
-  var aspectRatio = defaultExtent.height/defaultExtent.width;
-  var columnSize = Math.round(Math.sqrt(meshSize/(1/aspectRatio)));
-  var rowSize = Math.round(Math.sqrt(meshSize/aspectRatio));
 
-  var sortedMesh = currentMesh.mesh.vxs.slice().sort(sortByY);
-  var firstRow = sortedMesh.slice(0,rowSize).sort(sortByX);
-  var lastRow = sortedMesh.slice(meshSize - rowSize).sort(sortByX);
-  return [firstRow, lastRow];
+
+
+
+function sortWithIndices(toSort) {
+  for (var i = 0; i < toSort.length; i++) {
+    toSort[i] = [toSort[i], i];
+  }
+
+  //====
+  var arranged = [];
+  toSort.sort(function(a, b) {
+    //sort by x, secondary by y
+    return a[0] == b[0] ? a[1] - b[1] : a[0] - b[0];
+  });
+
+  for (var i = 0; i < toSort.length; i++) {
+
+    //check if was already added
+    if (typeof(toSort[i].wasAdded) == "undefined") {
+      arranged.push(toSort[i]);
+      toSort[i].wasAdded = "true";
+
+      for (j = i + 1; j < toSort.length; j++) {
+        if (toSort[i][1] > toSort[j][1] && typeof(toSort[j].wasAdded) == "undefined") {
+          arranged.push(toSort[j]);
+          toSort[j].wasAdded = "true";
+        }
+      }
+    }
+  }
+  // console.log(arranged);
+  toSort = arranged;
+  //=====
+
+  toSort.sortIndices = [];
+  for (var j = 0; j < toSort.length; j++) {
+    toSort.sortIndices.push(toSort[j][1]);
+    toSort[j] = toSort[j][0];
+  }
+  return toSort;
 }
-
 
 
 function sortByY(a, b){

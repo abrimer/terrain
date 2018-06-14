@@ -26,7 +26,7 @@ function zero(mesh) {
 }
 
 function randArb(min, max) {
-  return Math.random() * (max - min) + min;
+  return runif(0,1) * (max - min) + min;
 }
 
 
@@ -38,11 +38,12 @@ function randArb(min, max) {
  */
 function slopeRiver(mesh, direction) {
     return mesh.map(function (x) {
+      // console.log(x)
       if (x[0] < 0) {
         return 15*Math.pow(x[0]*-direction[0],1/2)
         - 20*x[0]*-direction[0]
         + 80*Math.pow(x[0]*-direction[0],2)
-        - (Math.sin(2*x[1]*direction[0])
+        - 0.5*(Math.sin(2*x[1]*direction[0])
         + Math.sin(7*x[1]*direction[0])
         + Math.sin(15*x[1]*direction[0])
         + Math.sin(18*x[1]*direction[0]))
@@ -51,33 +52,98 @@ function slopeRiver(mesh, direction) {
         return 15*Math.pow(x[0]*direction[0],1/2)
         - 20*x[0]*direction[0]
         + 80*Math.pow(x[0]*direction[0],2)
-        + Math.sin(2*x[1]*direction[0])
+        + 0.5*(Math.sin(2*x[1]*direction[0])
         + Math.sin(7*x[1]*direction[0])
         + Math.sin(15*x[1]*direction[0])
-        + Math.sin(18*x[1]*direction[0])
-        // + 0.2*Math.sin(40*x[1]*direction[0])
+        + Math.sin(18*x[1]*direction[0]))
+        // + 0.2*Math.sin(40*x[1]*direction[0]))
       }
     });
 }
 
 
-// /**
-//  * slopeRiver ... create a sloping height map
-//  *
-//  * @param	mesh
-//  * @param	imposed slope gradient
-//  */
-// function slopeRiver(mesh, direction) {
-//     return mesh.map(function (x) {
-//         if (x[0] < 0) {
-//
-//           return Math.pow(x[0]*-1*direction[0],1) - 8*Math.cos(x[1]*direction[1]);
-//         } else {
-//
-//           return Math.pow(x[0]*direction[0],1) + 8*Math.cos(x[1]*direction[1]);
-//         }
-//     });
-// }
+/**
+ * slopeRiver ... create a sloping height map
+ *
+ * @param	mesh
+ * @param	imposed slope gradient
+ */
+function slopeNoisyRiver(mesh, direction) {
+  var amp = 5;
+  var freq = 4;
+  var noiseGen = new Simple1DNoise(amp,freq);
+    return mesh.map(function (x) {
+        if (x[0] < 0) {
+          return 15*Math.pow(x[0]*-direction[0],1/2)
+          - 20*x[0]*-direction[0]
+          + 80*Math.pow(x[0]*-direction[0],2)
+          + noiseGen.getVal(x[1]);
+
+        } else {
+
+          return 15*Math.pow(x[0]*direction[0],1/2)
+          - 20*x[0]*direction[0]
+          + 80*Math.pow(x[0]*direction[0],2)
+          - noiseGen.getVal(x[1])+amp;
+
+        }
+    });
+}
+
+
+// Credit to: https://www.michaelbromley.co.uk/blog/simple-1d-noise-in-javascript/
+// Simple Noise Generator
+var Simple1DNoise = function(amplitude,scale) {
+    var MAX_VERTICES = 256;
+    var MAX_VERTICES_MASK = MAX_VERTICES -1;
+
+    var r = [];
+
+    for ( var i = 0; i < MAX_VERTICES; ++i ) {
+        r.push(runif(0,1));
+    }
+
+    var getVal = function( x ){
+        var scaledX = x * scale;
+        var xFloor = Math.floor(scaledX);
+        var t = scaledX - xFloor;
+        var tRemapSmoothstep = t * t * ( 3 - 2 * t );
+
+        /// Modulo using &
+        var xMin = xFloor & MAX_VERTICES_MASK;
+        var xMax = ( xMin + 1 ) & MAX_VERTICES_MASK;
+
+        var y = lerp( r[ xMin ], r[ xMax ], tRemapSmoothstep );
+
+        return y * amplitude;
+    };
+
+    /**
+    * Linear interpolation function.
+    * @param a The lower integer value
+    * @param b The upper integer value
+    * @param t The value between the two
+    * @returns {number}
+    */
+    var lerp = function(a, b, t ) {
+        return a * ( 1 - t ) + b * t;
+    };
+
+    // return the API
+    return {
+        getVal: getVal,
+        setAmplitude: function(newAmplitude) {
+            amplitude = newAmplitude;
+        },
+        setScale: function(newScale) {
+            scale = newScale;
+        }
+    };
+};
+
+
+
+
 
 //
 // /**
@@ -296,7 +362,7 @@ function mountains(mesh, n, r) {
     // choose a center location for each desired mountain
     var mounts = [];
     for (var i = 0; i < n; i++) {
-        mounts.push([mesh.extent.width * (runif(0,1) - 0.5), mesh.extent.height * (Math.random() - 0.5)]);
+        mounts.push([mesh.extent.width * (runif(0,1) - 0.5), mesh.extent.height * (runif(0,1) - 0.5)]);
     }
 
     var newvals = zero(mesh);
@@ -329,28 +395,28 @@ function ridges(mesh, n, r1, r2) {
     r2 = r2 || 20;
 
     // choose a center location for the ridges
-    var cent = [((Math.random() - 0.5) * 0.5), ((Math.random() - 0.5) * 0.5)];
-    var angle = Math.random() * 2 * Math.PI;
+    var cent = [((runif(0,1) - 0.5) * 0.5), ((runif(0,1) - 0.5) * 0.5)];
+    var angle = runif(0,1) * 2 * Math.PI;
     var ridgeangle = angle + Math.PI / 2;
     var inter = [];
     for (var i = 0; i < n; i++) {
-        inter.push((2.5 + Math.random() * 0.5) * r1);
+        inter.push((2.5 + runif(0,1) * 0.5) * r1);
     }
     var interCenter = inter.reduce(sumArray, 0) / 2.0;
     // extrapolate from center to each ridge center
     var mounts = [];
     for (var i = 0; i < n; i++) {
-        var ridgecheatw = (Math.random() - 0.5) * r1 * 2;
-        var ridgecheath = (Math.random() - 0.5) * r1 * 2;
+        var ridgecheatw = (runif(0,1) - 0.5) * r1 * 2;
+        var ridgecheath = (runif(0,1) - 0.5) * r1 * 2;
         var fromCenter = interCenter - inter.slice(0,i).reduce(sumArray, 0);
         var ridgecent = [cent[0] + Math.cos(angle) * fromCenter + ridgecheatw, cent[1] + Math.sin(angle) * fromCenter + ridgecheath];
-        var ridgeLength = Math.floor(Math.random() * (r2 + 1)) + Math.floor(r2 / 2);
+        var ridgeLength = Math.floor(runif(0,1) * (r2 + 1)) + Math.floor(r2 / 2);
         for (var j = 0; j < ridgeLength; j++) {
-            var thisAngle = ridgeangle + (Math.random() - 0.5) * Math.PI * 0.1;
-            var cheatw = (Math.random() - 0.5) * r1 * 0.5;
-            var cheath = (Math.random() - 0.5) * r1 * 0.5;
-            var wdist = r1 * (j - r2/2) + (Math.random() - 0.5) * r1 * 0.5;
-            var hdist = r1 * (j - r2/2) + (Math.random() - 0.5) * r1 * 0.5;
+            var thisAngle = ridgeangle + (runif(0,1) - 0.5) * Math.PI * 0.1;
+            var cheatw = (runif(0,1) - 0.5) * r1 * 0.5;
+            var cheath = (runif(0,1) - 0.5) * r1 * 0.5;
+            var wdist = r1 * (j - r2/2) + (runif(0,1) - 0.5) * r1 * 0.5;
+            var hdist = r1 * (j - r2/2) + (runif(0,1) - 0.5) * r1 * 0.5;
             mounts.push([ridgecent[0] + Math.cos(thisAngle) * wdist + cheatw, ridgecent[1] + Math.sin(thisAngle) * hdist + cheath]);
         }
     }
