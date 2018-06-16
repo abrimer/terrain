@@ -60,7 +60,7 @@
 				.sea {
 			stroke: #ADD8E6;
 			/* fill: #0f5e9c; */
-			fill: #ADD8E6
+			fill: #ADD8E6;
 				}
 
 				.land {
@@ -100,12 +100,16 @@
 		<div class="example" id="main"></div>
 
 		<!-- modules of the terrain generator -->
+		<script src="./seedrandom.js"></script>
+		<script src="./simplex-noise.js"></script>
+		<script src="./mersennetwister.js"></script>
+
 		<script src="./mesh.js"></script>
 		<script src="./height.js"></script>
 		<script src="./water.js"></script>
 		<script src="./cities.js"></script>
 		<script src="./terrain.js"></script>
-		<script src="./mersennetwister.js"></script>
+
 
 		<!-- populate them with rendering controls -->
 		<script src="./interface.js" href=""></script>

@@ -41,7 +41,7 @@ function slopeRiver(mesh, direction) {
       // console.log(x)
       if (x[0] < 0) {
         return 15*Math.pow(x[0]*-direction[0],1/2)
-        - 20*x[0]*-direction[0]
+        - 20*(x[0]*-direction[0])
         + 80*Math.pow(x[0]*-direction[0],2)
         - 0.5*(Math.sin(2*x[1]*direction[0])
         + Math.sin(7*x[1]*direction[0])
@@ -50,7 +50,7 @@ function slopeRiver(mesh, direction) {
         // + 0.2*Math.sin(40*x[1]*direction[0]))
       } else {
         return 15*Math.pow(x[0]*direction[0],1/2)
-        - 20*x[0]*direction[0]
+        - 20*(x[0]*direction[0])
         + 80*Math.pow(x[0]*direction[0],2)
         + 0.5*(Math.sin(2*x[1]*direction[0])
         + Math.sin(7*x[1]*direction[0])
@@ -61,87 +61,61 @@ function slopeRiver(mesh, direction) {
     });
 }
 
+//=====
+var offsetCount = 0;
+var randomSeed = 0;
 
-/**
- * slopeRiver ... create a sloping height map
- *
- * @param	mesh
- * @param	imposed slope gradient
- */
-function slopeNoisyRiver(mesh, direction) {
-  var amp = 5;
-  var freq = 4;
-  var noiseGen = new Simple1DNoise(amp,freq);
+var seedRandom = new Math.seedrandom(randomSeed);
+
+// Source: https://github.com/joshforisha/fast-simplex-noise-js/
+var simplexRiverNoise = new FastSimplexNoise({
+				// amplitude: 0.015,
+        amplitude: 1,
+        // frequency: 0.015,
+				frequency: 1.75,
+				octaves: 1,
+				max: 1,
+				min: -1,
+        random: seedRandom
+});
+
+var simplexTerrain = new FastSimplexNoise({
+        amplitude: 1,
+				frequency: 1.5,
+				octaves: 3,
+				max: 1,
+				min: -1,
+        random: seedRandom
+});
+var offsetY;
+
+function simplexNoise(mesh, noiseAmount) {
+
     return mesh.map(function (x) {
-        if (x[0] < 0) {
-          return 15*Math.pow(x[0]*-direction[0],1/2)
-          - 20*x[0]*-direction[0]
-          + 80*Math.pow(x[0]*-direction[0],2)
-          + noiseGen.getVal(x[1]);
-
-        } else {
-
-          return 15*Math.pow(x[0]*direction[0],1/2)
-          - 20*x[0]*direction[0]
-          + 80*Math.pow(x[0]*direction[0],2)
-          - noiseGen.getVal(x[1])+amp;
-
-        }
+        return noiseAmount*simplexTerrain.in2D(x[0],x[1]+offsetY);
     });
 }
 
+function simplexRiver(mesh, direction) {
+  offsetY = offsetCount;
 
-// Credit to: https://www.michaelbromley.co.uk/blog/simple-1d-noise-in-javascript/
-// Simple Noise Generator
-var Simple1DNoise = function(amplitude,scale) {
-    var MAX_VERTICES = 256;
-    var MAX_VERTICES_MASK = MAX_VERTICES -1;
+  offsetCount = offsetCount + 2 - 0.06;
+  return mesh.map(function (x) {
+    // console.log(simplex.noise2D(x[1]+offsetY,0)*8);
+      if (x[0] < 0) {
+        return 15*Math.pow(x[0]*-direction[0],1/2)
+        - 20*x[0]*-direction[0]
+        + 80*Math.pow(x[0]*-direction[0],2)
+        + simplexRiverNoise.in2D(x[1]+offsetY,0)*5;
+      } else {
 
-    var r = [];
-
-    for ( var i = 0; i < MAX_VERTICES; ++i ) {
-        r.push(runif(0,1));
-    }
-
-    var getVal = function( x ){
-        var scaledX = x * scale;
-        var xFloor = Math.floor(scaledX);
-        var t = scaledX - xFloor;
-        var tRemapSmoothstep = t * t * ( 3 - 2 * t );
-
-        /// Modulo using &
-        var xMin = xFloor & MAX_VERTICES_MASK;
-        var xMax = ( xMin + 1 ) & MAX_VERTICES_MASK;
-
-        var y = lerp( r[ xMin ], r[ xMax ], tRemapSmoothstep );
-
-        return y * amplitude;
-    };
-
-    /**
-    * Linear interpolation function.
-    * @param a The lower integer value
-    * @param b The upper integer value
-    * @param t The value between the two
-    * @returns {number}
-    */
-    var lerp = function(a, b, t ) {
-        return a * ( 1 - t ) + b * t;
-    };
-
-    // return the API
-    return {
-        getVal: getVal,
-        setAmplitude: function(newAmplitude) {
-            amplitude = newAmplitude;
-        },
-        setScale: function(newScale) {
-            scale = newScale;
-        }
-    };
-};
-
-
+        return 15*Math.pow(x[0]*direction[0],1/2)
+        - 20*x[0]*direction[0]
+        + 80*Math.pow(x[0]*direction[0],2)
+        - simplexRiverNoise.in2D(x[1]+offsetY,0)*5;
+      }
+  });
+}
 
 
 
@@ -524,6 +498,8 @@ function visualizeVoronoi(svg, field, lo, hi) {
         .style('fill', function (d, i) {
           // return color(mappedvals[i]);
           return d3.interpolateYlGn(0.55-mappedvals[i]);
+          // return d3.interpolateRdYlGn(0.8-mappedvals[i]);
+
         });
 
     $(".sea").css("fill","#ADD8E6");

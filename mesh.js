@@ -47,23 +47,106 @@ function generatePoints(n, extent) {
     return pts;
 }
 
+var randomSeed = 0;
+
+var seedRandom = new Math.seedrandom(randomSeed);
+
+var simplexPoints = new FastSimplexNoise({
+        amplitude: 1,
+				frequency: 8,
+				octaves: 1,
+				max: 1,
+				min: -1,
+        random: seedRandom
+});
+
+// var value = simplexPoints.raw2D(x,y)
+
+var newRand = new MersenneTwister(randomSeed);
+  newRand.random()
+
+function generateSimplexPoints(n, extent) {
+    extent = extent || defaultExtent;
+    var pts = [];
+    for (var i = 0; i < n; i++) {
+        pts.push([(runif(0,1) - 0.5) * extent.width, (runif(0,1) - 0.5) * extent.height]);
+    }
+
+
+
+
+    return pts;
+}
+
+// Linear Congruential Generator
+// Variant of a Lehman Generator
+var lcg = (function() {
+  // Set to values from http://en.wikipedia.org/wiki/Numerical_Recipes
+      // m is basically chosen to be large (as it is the max period)
+      // and for its relationships to a and c
+  var m = 4294967296,
+      // a - 1 should be divisible by m's prime factors
+      a = 1664525,
+      // c and m should be co-prime
+      c = 1013904223,
+      seed, z;
+  return {
+    setSeed : function(val) {
+      z = seed = val || Math.round(Math.random() * m);
+    },
+    getSeed : function() {
+      return seed;
+    },
+    rand : function() {
+      // define the recurrence relationship
+      z = (a * z + c) % m;
+      // return a float in [0, 1)
+      // if z = m then z / m = 0 therefore (z % m) / m < 1 always
+      return z / m;
+    }
+  };
+}());
+
+
+
 function generateGrid(n, extent) {
   extent = extent || defaultExtent;
   var pts = [];
   var rowSize = Math.round(Math.sqrt(n/aspectRatio));
   var columnSize = Math.round(Math.sqrt(n*aspectRatio));
-
-  var halfWidth = 0.5*extent.width;
-  var halfHeight = 0.5*extent.height;
-  var arrX = linSpace(-halfWidth,halfWidth,rowSize);
-  var arrY = linSpace(-halfHeight,halfHeight,columnSize);
-
-  for (var i = 0; i < rowSize; i++) {
-      for (var j = 0; j < columnSize; j++) {
-        pts.push([arrX[i], arrY[j]]);
-
+  var height = columnSize;
+  var width = rowSize;
+  var value = [];
+  for (let y = 0; y < height; y++) {
+    value[y] = [];
+    for (let x = 0; x < width; x++) {
+      let nx = x/width - 0.5;
+      let ny = y/height - 0.5;
+      if (simplexPoints.in2D(nx, ny) < 0.75) {
+        value[y][x] = 0;
+      } else {
+        value[y][x] = simplexPoints.in2D(nx, ny);
       }
+    }
   }
+
+
+
+
+  console.log(pts)
+
+  // var halfWidth = 0.5*extent.width;
+  // var halfHeight = 0.5*extent.height;
+  // var arrX = linSpace(-halfWidth,halfWidth,rowSize);
+  // var arrY = linSpace(-halfHeight,halfHeight,columnSize);
+  //
+  // for (var i = 0; i < rowSize; i++) {
+  //     for (var j = 0; j < columnSize; j++) {
+  //       pts.push([simplex.noise2D(i,j), simplex.noise2D(j,i)]);
+  //       console.log([simplex.noise2D(i+j,), simplex.noise2D(j,i)]);
+  //
+  //     }
+  // }
   return pts;
 }
 
@@ -149,6 +232,8 @@ function improvePoints(pts, n, extent) {
 function generateGoodPoints(n, extent) {
     extent = extent || defaultExtent;
     var pts = generatePoints(n, extent);
+    // var pts = generateGrid(n, extent);
+
 
     // pts = sortWithIndices(pts);
     pts.sort(function(a, b) {

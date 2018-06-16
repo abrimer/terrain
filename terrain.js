@@ -4,8 +4,8 @@
 var defaultParams = {
     extent: defaultExtent,
     generator: generateCoast,
-    npts: 32768,
-    ncities: 20,
+    npts: 32768/2,
+    ncities: 24,
     nterrs: 6,
     fontsizes: {
         region: 40,
@@ -22,40 +22,39 @@ var aspectRatio = defaultExtent.height/defaultExtent.width;
 
 
 var previousMesh;
-var overlap = 0.25;
-var overlapAmount = Math.round(defaultParams.npts * overlap);
-
+var previousMeshCount = 0;
 
 function generateRiver(params) {
     var mesh = generateGoodMesh(params.npts, params.extent);
 
     var h = add(
-            slopeRiver(mesh, [1,0]),
-            // slopeNoisyRiver(mesh, [1,0]),
+            simplexRiver(mesh, [1,0]),
+            simplexNoise(mesh, 2),
 
-            mountains(mesh, 80)
+            // slopeRiver(mesh, [1,0]),
+
+            // mountains(mesh, 80)
             );
-    for (var i = 0; i < 5; i++) {
+    for (var i = 0; i < 4; i++) {
         h = relax(h);
     }
     h = peaky(h);
 
-    // h = setSeedRow(h);
 
-    // h = doErosion(h, runif(0.1, 0.1), 5);
-    // h = doErosion(h, runif(0.2,0.2), 4);
     // previousMesh = h.seedRow;
     h = doErosion(h, runif(0.3,0.3), 3);
 
-
-
-    // h = setSeaLevel(h, runif(0.2, 0.6));
-    h = setSeaLevel(h, runif(0.35, 0.35));
+    h = setSeaLevel(h, runif(0.4, 0.4));
 
     h = fillSinks(h);
     h = cleanCoast(h, 3);
 
-    previousMesh = h;
+    console.log("=======")
+    console.log("=======")
+    console.log("=======")
+
+    // previousMesh = h;
+    previousMeshCount++;
 
     return h;
 }

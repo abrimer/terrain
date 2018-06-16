@@ -11,10 +11,8 @@
  */
 
 // RANDOM SEED sets all randomness
- var randomSeed = 0;
- // var newRand = new Math.seedrandom(randCount);
  var newRand = new MersenneTwister(randomSeed);
-
+ var simplex2 = new SimplexNoise(randomSeed);
  /**
   * runif: random number within a range
   *
@@ -25,6 +23,13 @@
  function runif(lo, hi) {
      return lo + newRand.random() * (hi - lo);
  }
+
+// var randomCount = 0;
+// function runif(lo, hi) {
+//   randomCount = randomCount + 100;
+//   // console.log(simplex2.noise2D(randomCount,0))
+//   return lo + simplex2.noise2D(randomCount,0) * (hi - lo);
+//  }
 
 
 /**
@@ -88,7 +93,7 @@ function mainDraw(mainSVG) {
         drawPaths(mainSVG, "coast", []);
     }
     if (mainViewRivers) {
-        drawPaths(mainSVG, "river", getRivers(mainRender.h, 0.004));
+        drawPaths(mainSVG, "river", getRivers(mainRender.h, 0.003));
         // Limit sets threshold above which rivers are visualized
     } else {
         drawPaths(mainSVG, "river", []);
@@ -107,7 +112,7 @@ function mainDraw(mainSVG) {
         drawPaths(mainSVG, 'border', getBorders(mainRender));
     }
     if (mainViewLabels) {
-        mainRender.rivers = getRivers(mainRender.h, 0.01);
+        mainRender.rivers = getRivers(mainRender.h, 0.003);
         mainRender.coasts = contour(mainRender.h, 0);
         mainRender.terr = getTerritories(mainRender);
         mainRender.borders = getBorders(mainRender);
@@ -129,8 +134,6 @@ function mainDraw(mainSVG) {
     //    $('#download').attr('href', 'data:application/octet-stream;base64,' + btoa($("#svg-container").html()));
     // });
 }
-
-
 
 
 // RIVER GENERATION
