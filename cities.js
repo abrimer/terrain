@@ -211,17 +211,14 @@ function visualizeCities(svg, render) {
         .attr('cx', function (d) {return 1000*h.mesh.vxs[d][0]})
         .attr('cy', function (d) {return 1000*h.mesh.vxs[d][1]})
         .attr('r', function (d, i) {return i >= n ? 6 : 14})
+        .attr('id',function(d) {return d})
         .style('fill', function (d, i) {return i >= n ? 'black' : 'gold'})
         .style('stroke-width', 5)
         .style('stroke-linecap', 'round')
         .style('stroke', 'black')
         .raise();
 
-    // $("circle.city").hover(function() {
-    //   $(this).css("fill", "white");
-    //     }, function(){
-    //   $(this).css("fill", "red");
-    // });
+    
     // $("circle.city").click(function() {
     //   $("#cityModal").show();
     //   $(".modalCityName").text("Test!")

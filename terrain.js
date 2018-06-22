@@ -4,7 +4,7 @@
 var defaultParams = {
     extent: defaultExtent,
     generator: generateCoast,
-    npts: 32768/2,
+    npts: 32768/4,
     ncities: 24,
     nterrs: 6,
     fontsizes: {
@@ -30,6 +30,8 @@ function generateRiver(params) {
     var h = add(
             simplexRiver(mesh, [1,0]),
             simplexNoise(mesh, 2),
+            // simplexFuzzyNoise(mesh, 2),
+
 
             // slopeRiver(mesh, [1,0]),
 
@@ -490,6 +492,8 @@ function drawLabels(svg, render, newLang = false) {
         var x = h.mesh.vxs[cities[i]][0];
         var y = h.mesh.vxs[cities[i]][1];
         var text = makeName(render.lang, 'city');
+
+
         var size = i < nterrs ? params.fontsizes.city : params.fontsizes.town;
         var sx = 0.65 * size/1000 * text.length;
         var sy = size/1000;
@@ -535,6 +539,8 @@ function drawLabels(svg, render, newLang = false) {
         label.text = text;
         label.size = size;
         citylabels.push(label);
+        var cityEl = document.getElementById(cities[i])
+        cityEl.setAttribute('name', text);
     }
     var texts = svg.selectAll('text.city').data(citylabels);
     texts.enter()
@@ -549,6 +555,20 @@ function drawLabels(svg, render, newLang = false) {
         .style('text-anchor', function (d) {return d.align})
         .text(function (d) {return d.text})
         .raise();
+    $("circle.city").hover(function() {
+      $("#cityModal").show();
+      $("#modalCityName").text($(this).attr("name"));
+      let tempWidth = defaultExtent.width*500;
+      let tempHeight = defaultExtent.height*500;
+      let cyy = (parseInt($(this).attr("cy"))+tempHeight)
+      $("#cityModal").css("margin-top",cyy+"px");
+      $("#cityModal").css("margin-left",(parseInt($(this).attr("cx"))+tempWidth)/(tempWidth*2)*100+"%");
+      $(this).css("fill", "white");
+        }, function(){
+      $(this).css("fill", "red");
+      $("#cityModal").hide();
+
+    });
 
     var reglabels = [];
     for (var i = 0; i < nterrs; i++) {

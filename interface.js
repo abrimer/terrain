@@ -51,7 +51,7 @@ function addSVG(div, h, w) {
         .attr("viewBox", "-500 -500 1000 1000")
 
         .attr("class","svg")
-        // .attr("preserveAspectRatio","xMidYMid meet");
+        .attr("preserveAspectRatio","xMidYMid meet");
 }
 
 /**
@@ -61,7 +61,7 @@ var mainDiv = d3.select("div#main");
 
 var mainRender = {
     params: defaultParams,
-    h: zero(generateGoodMesh(defaultParams.npts, defaultExtent)),
+    // h: zero(generateGoodMesh(defaultParams.npts, defaultExtent)),
     cities: [],
     lang: makeRandomLanguage()
 };

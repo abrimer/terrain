@@ -93,6 +93,24 @@ function simplexNoise(mesh, noiseAmount) {
 
     return mesh.map(function (x) {
         return noiseAmount*simplexTerrain.in2D(x[0],x[1]+offsetY);
+        // + 80*Math.pow(x[0],2);
+    });
+}
+
+var simplexFuzzyTerrain = new FastSimplexNoise({
+        amplitude: 1,
+				frequency: 128,
+				octaves: 8,
+				max: 1,
+				min: -1,
+        random: seedRandom
+});
+var offsetY;
+
+function simplexFuzzyNoise(mesh, noiseAmount) {
+
+    return mesh.map(function (x) {
+        return noiseAmount*simplexFuzzyTerrain.in2D(x[0],x[1]+offsetY);
     });
 }
 

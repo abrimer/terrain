@@ -78,75 +78,150 @@ function generateSimplexPoints(n, extent) {
     return pts;
 }
 
-// Linear Congruential Generator
-// Variant of a Lehman Generator
-var lcg = (function() {
-  // Set to values from http://en.wikipedia.org/wiki/Numerical_Recipes
-      // m is basically chosen to be large (as it is the max period)
-      // and for its relationships to a and c
-  var m = 4294967296,
-      // a - 1 should be divisible by m's prime factors
-      a = 1664525,
-      // c and m should be co-prime
-      c = 1013904223,
-      seed, z;
-  return {
-    setSeed : function(val) {
-      z = seed = val || Math.round(Math.random() * m);
-    },
-    getSeed : function() {
-      return seed;
-    },
-    rand : function() {
-      // define the recurrence relationship
-      z = (a * z + c) % m;
-      // return a float in [0, 1)
-      // if z = m then z / m = 0 therefore (z % m) / m < 1 always
-      return z / m;
-    }
-  };
-}());
+// // Linear Congruential Generator
+// // Variant of a Lehman Generator
+// var lcg = (function() {
+//   // Set to values from http://en.wikipedia.org/wiki/Numerical_Recipes
+//       // m is basically chosen to be large (as it is the max period)
+//       // and for its relationships to a and c
+//   var m = 4294967296,
+//       // a - 1 should be divisible by m's prime factors
+//       a = 1664525,
+//       // c and m should be co-prime
+//       c = 1013904223,
+//       seed, z;
+//   return {
+//     setSeed : function(val) {
+//       z = seed = val || Math.round(Math.random() * m);
+//     },
+//     getSeed : function() {
+//       return seed;
+//     },
+//     rand : function() {
+//       // define the recurrence relationship
+//       z = (a * z + c) % m;
+//       // return a float in [0, 1)
+//       // if z = m then z / m = 0 therefore (z % m) / m < 1 always
+//       return z / m;
+//     }
+//   };
+// }());
 
+
+
+function createLCG(options) {
+	options = options || {};
+	var seed = typeof options.seed === 'undefined' ?
+		1 : options.seed;
+	var a = typeof options.multiplier === 'undefined' ?
+		16807 : options.multiplier;
+	var c = typeof options.increment === 'undefined' ?
+		0 : options.increment;
+	var m = typeof options.modulus === 'undefined' ?
+		2147483647 : options.modulus;
+
+	var state = Math.abs(seed);
+  var stateCount = 0;
+	return {
+    rand: function() {
+  		var result = (state*a + c) % m;
+  		state = result;
+      stateCount++;
+
+  		return result / m;
+    },
+    getState: function() {
+      return state;
+    }
+	};
+}
+var randLCG = createLCG(lcgOptions)
+
+function skipLCG(n) {
+  for (let i = 0; i < n-1; i++) {
+    randLCG.rand();
+  }
+  return randLCG.rand();
+}
+
+
+var lcgOptions = {
+  seed: 1,
+  a: 5^19,
+  b: 11,
+  m: Math.pow(2,32)
+};
+
+skipLCG(1000000)
+
+
+var globalY = -1;
+var sliceHeight = 0.01
+
+function generateSlicePoints(n,extent,sliceCount) {
+
+  var sumSlices = [];
+  var tempSlice;
+  for (let i = 0; i < sliceCount; i++) {
+    sumSlices.push(generateRowSlice(n,extent));
+    globalY = sliceHeight + globalY;
+  }
+  var merged = [].concat.apply([], sumSlices);
+  return merged;
+  globalY = extent.height-sliceHeight;
+}
+
+function generateRowSlice(n, extent) {
+  extent = extent || defaultExtent;
+  var pts = [];
+  var nCol = 50;
+
+  for (let i = 0; i < nCol; i++) {
+    pts.push([
+      runif(-extent.width/2,extent.width/2),
+      runif(globalY,globalY+sliceHeight)
+    ]);
+  }
+  return pts;
+}
 
 
 function generateGrid(n, extent) {
   extent = extent || defaultExtent;
   var pts = [];
+
   var rowSize = Math.round(Math.sqrt(n/aspectRatio));
   var columnSize = Math.round(Math.sqrt(n*aspectRatio));
   var height = columnSize;
   var width = rowSize;
-  var value = [];
-  for (let y = 0; y < height; y++) {
-    value[y] = [];
-    for (let x = 0; x < width; x++) {
-      let nx = x/width - 0.5;
-      let ny = y/height - 0.5;
-      if (simplexPoints.in2D(nx, ny) < 0.75) {
-        value[y][x] = 0;
-      } else {
-        value[y][x] = simplexPoints.in2D(nx, ny);
-      }
-    }
-  }
-
-
-
-
-  console.log(pts)
-
-  // var halfWidth = 0.5*extent.width;
-  // var halfHeight = 0.5*extent.height;
-  // var arrX = linSpace(-halfWidth,halfWidth,rowSize);
-  // var arrY = linSpace(-halfHeight,halfHeight,columnSize);
-  //
-  // for (var i = 0; i < rowSize; i++) {
-  //     for (var j = 0; j < columnSize; j++) {
-  //       pts.push([simplex.noise2D(i,j), simplex.noise2D(j,i)]);
-  //       console.log([simplex.noise2D(i+j,), simplex.noise2D(j,i)]);
-  //
+  // var value = [];
+  // for (let y = 0; y < height; y++) {
+  //   value[y] = [];
+  //   for (let x = 0; x < width; x++) {
+  //     let nx = x/width - 0.5;
+  //     let ny = y/height - 0.5;
+  //     if (simplexPoints.in2D(nx, ny) < 0.75) {
+  //       value[y][x] = 0;
+  //     } else {
+  //       value[y][x] = simplexPoints.in2D(nx, ny);
   //     }
+  //   }
   // }
+
+  var halfWidth = 0.5*extent.width;
+  var halfHeight = 0.5*extent.height;
+  var arrX = linSpace(-halfWidth,halfWidth,rowSize);
+  var arrY = linSpace(-halfHeight,halfHeight,columnSize);
+
+  for (var i = 0; i < rowSize; i++) {
+      for (var j = 0; j < columnSize; j++) {
+        if (Math.round(runif(0,1)) == 1) {
+          pts.push([arrX[i],arrY[j]]);
+          // pts.push([simplex.noise2D(i,j), simplex.noise2D(j,i)]);
+        }
+
+      }
+  }
   return pts;
 }
 
@@ -349,6 +424,7 @@ function makeMesh(pts, extent) {
 function generateGoodMesh(n, extent) {
     extent = extent || defaultExtent;
     var pts = generateGoodPoints(n, extent);
+    // var pts = generateSlicePoints(n, extent, 200);
     // var pts = generateGrid(n,extent);
     return makeMesh(pts, extent);
 }
