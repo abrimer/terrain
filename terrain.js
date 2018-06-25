@@ -555,20 +555,52 @@ function drawLabels(svg, render, newLang = false) {
         .style('text-anchor', function (d) {return d.align})
         .text(function (d) {return d.text})
         .raise();
+
     $("circle.city").hover(function() {
       $("#cityModal").show();
-      $("#modalCityName").text($(this).attr("name"));
+      let cityName = $(this).attr("name");
+      $("#modalCityName").text(cityName);
+      let cityDescription = "This is example text as a placeholder. This is example text as a placeholder. This is example text as a placeholder.";
+      $(".modal-city-description").text(cityDescription);
+
+
       let tempWidth = defaultExtent.width*500;
       let tempHeight = defaultExtent.height*500;
-      let cyy = (parseInt($(this).attr("cy"))+tempHeight)
-      $("#cityModal").css("margin-top",cyy+"px");
-      $("#cityModal").css("margin-left",(parseInt($(this).attr("cx"))+tempWidth)/(tempWidth*2)*100+"%");
+      let xx = $(this)[0].getBoundingClientRect().x;
+      let yy = $(this)[0].getBoundingClientRect().y + window.scrollY;
+      let modalHeight = $("#cityModal")[0].getBoundingClientRect().height;
+      $("#cityModal").css("margin-top",yy - modalHeight/2 - 10);
+      $("#cityModal").css("margin-left",xx);
+      dontGoOffScreenX();
       $(this).css("fill", "white");
+
         }, function(){
       $(this).css("fill", "red");
       $("#cityModal").hide();
 
     });
+
+    function dontGoOffScreenX() {
+      var myLeft = $("#cityModal")[0].getBoundingClientRect().left;
+      let modalWidth = $("#cityModal")[0].getBoundingClientRect().width;
+      let windowWidth = $(window).width();
+
+			var windowLeft = $(window).scrollLeft();
+
+			// if the tooltip goes off the left side of the screen, line it up with the left side of the window
+			if((myLeft - windowLeft) < 0) {
+
+				// arrowReposition = myLeft - windowLeft;
+				myLeft = windowLeft + modalWidth/2;
+        $("#cityModal").css("margin-left",myLeft);
+
+			} else if (((myLeft + modalWidth) - windowLeft) > windowWidth) {
+				myLeft = (windowWidth + windowLeft) - modalWidth/2;
+        $("#cityModal").css("margin-left",myLeft);
+
+
+			}
+		}
 
     var reglabels = [];
     for (var i = 0; i < nterrs; i++) {

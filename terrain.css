@@ -67,18 +67,23 @@ select {
   z-index: 100;
   display: none;
   background-color: #fefefe;
-  padding: 20px;
+  padding: 10px;
   border: 1px solid #888;
   width: 300px;
-  height: 100px;
+  /* height: 50px; */
   position: absolute;
   top: 0;
   left: 0;
   transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50% -50%);
 }
 
 h2 {
   text-align: center;
+}
+
+.modal-city-description {
+  font-size: 12pt;
 }
 
 /* The Close Button */
