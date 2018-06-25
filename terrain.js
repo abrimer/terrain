@@ -560,24 +560,39 @@ function drawLabels(svg, render, newLang = false) {
       $("#cityModal").show();
       let cityName = $(this).attr("name");
       $("#modalCityName").text(cityName);
-      let cityDescription = "This is example text as a placeholder. This is example text as a placeholder. This is example text as a placeholder.";
+      let cityDescription = "This is example text as a placeholder.";
       $(".modal-city-description").text(cityDescription);
 
-
+      let cx = $(this).attr("cx");
+      let cy = $(this).attr("cy");
       let tempWidth = defaultExtent.width*500;
       let tempHeight = defaultExtent.height*500;
       let xx = $(this)[0].getBoundingClientRect().x;
       let yy = $(this)[0].getBoundingClientRect().y + window.scrollY;
       let modalHeight = $("#cityModal")[0].getBoundingClientRect().height;
-      $("#cityModal").css("margin-top",yy - modalHeight/2 - 10);
+      let modalPaddingBottom = 20;
+      $("#cityModal").css("margin-top",yy - modalHeight/2 - modalPaddingBottom);
       $("#cityModal").css("margin-left",xx);
       dontGoOffScreenX();
+
       $(this).css("fill", "white");
 
-        }, function(){
-      $(this).css("fill", "red");
-      $("#cityModal").hide();
+      let scaleFactor = 1.5
+      let t1 = "translate(" + -cx*scaleFactor + " " + -cy*scaleFactor +")";
+      let t2 = "scale(" + scaleFactor + ")";
+      let t3 = "translate(" + cx/scaleFactor + " " + cy/scaleFactor + ")";
+      $(this).attr("transform",t1 + " " + t2 + " " + t3);
 
+
+    }, function(){
+      $(this).css("fill", "red");
+      let cx = $(this).attr("cx");
+      let cy = $(this).attr("cy");
+      $("#cityModal").hide();
+      let t1 = "translate(" + -cx + " " + -cy +")";
+      let t2 = "scale(" + 1 + ")";
+      let t3 = "translate(" + cx + " " + cy + ")";
+      $(this).attr("transform",t1 + " " + t2 + " " + t3);
     });
 
     function dontGoOffScreenX() {
